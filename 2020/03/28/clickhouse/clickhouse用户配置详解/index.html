@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        clickhouse用户配置详解 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、users-xml文件示例"><span class="toc-text">一、users.xml文件示例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、profile设置详解"><span class="toc-text">二、profile设置详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、profile配置详情"><span class="toc-text">1、profile配置详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、profile配置约束"><span class="toc-text">2、profile配置约束</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、profile切换和继承"><span class="toc-text">3、profile切换和继承</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、users配置详解"><span class="toc-text">三、users配置详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、users配置详情"><span class="toc-text">1、users配置详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、users属性详解"><span class="toc-text">2、users属性详解</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、quotas配置详解"><span class="toc-text">四、quotas配置详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、quotas配置详情"><span class="toc-text">1、quotas配置详情</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、quotas属性详解"><span class="toc-text">2、quotas属性详解</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        clickhouse用户配置详解
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-03-28 22:51:30</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p><strong>参考网页：</strong></p>
+<ul>
+<li><a href="https://clickhouse.tech/docs/zh/" target="_blank" rel="noopener">clickhouse官方文档</a></li>
+<li><a href="https://clickhouse.tech/docs/zh/operations/settings/settings/" target="_blank" rel="noopener">clickhouse配置文件参数</a></li>
+</ul>
+<p>​        ClickHouse的用户及访问权限控制均可由配置文件直接进行标准化配置，一般由<code>users.xml</code>文件设置，该文件名在/etc/clickhouse-server/config.xml中修改，详情可参考<a href="[https://schnappi618.github.io/2020/03/28/clickhouse-server%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%AF%A6%E8%A7%A3/](https://schnappi618.github.io/2020/03/28/clickhouse-server配置文件详解/)">clickhouse-server配置文件详解</a>，若需要对某一个用户单独设置例如dba用户，可放入<code>/etc/clickhouse-server/users.d/dba.xml</code>，下面会描述该文件的配置示例。</p>
+<h2 id="一、users-xml文件示例"><a href="#一、users-xml文件示例" class="headerlink" title="一、users.xml文件示例"></a>一、users.xml文件示例</h2><p>​        以下是一个标准默认的<code>users.xml</code>用户配置示例，可直接测试使用，对用户的权限管理将会单独使用一篇文章来进行说明，后面将会对该文件分开描述。</p>
+<p>​        有文件中可以看出users.xml主要由以下三部分设置组成：</p>
+<ul>
+<li>profile：类似于用户角色，可以实现最大内存、负载方式等配置的服用</li>
+<li>users：设置包括用户名、密码、权限等</li>
+<li>quotas：限制一段时间内的资源使用等</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">yandex</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">profiles</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">max_memory_usage</span>&gt;</span>10000000000<span class="tag">&lt;/<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">load_balancing</span>&gt;</span>random<span class="tag">&lt;/<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">constraints</span>&gt;</span><span class="comment">&lt;!-- 配置约束--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">min</span>&gt;</span>5000000000<span class="tag">&lt;/<span class="name">min</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">max</span>&gt;</span>20000000000<span class="tag">&lt;/<span class="name">max</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">readonly</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">constraints</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">readonly</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">readonly</span>&gt;</span>1<span class="tag">&lt;/<span class="name">readonly</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">readonly</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">users</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">password</span>&gt;</span><span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">        				<span class="tag">&lt;<span class="name">ip</span>&gt;</span>127.0.0.1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"></span><br><span class="line">            <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">      <span class="comment">&lt;!--下面两个用户为测试用户，可以不配置--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">seluser</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">password</span>&gt;</span>meiyoumima<span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::/0<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">profile</span>&gt;</span>readonly<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">seluser</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">inuser</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">password</span>&gt;</span>meiyoumima<span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::/0<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">inuser</span>&gt;</span></span><br><span class="line">      </span><br><span class="line">    <span class="tag">&lt;/<span class="name">users</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!-- Quotas. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">quotas</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">interval</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">duration</span>&gt;</span>3600<span class="tag">&lt;/<span class="name">duration</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">queries</span>&gt;</span>0<span class="tag">&lt;/<span class="name">queries</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">errors</span>&gt;</span>0<span class="tag">&lt;/<span class="name">errors</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">result_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">result_rows</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">read_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">read_rows</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">execution_time</span>&gt;</span>0<span class="tag">&lt;/<span class="name">execution_time</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">interval</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">quotas</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">yandex</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二、profile设置详解"><a href="#二、profile设置详解" class="headerlink" title="二、profile设置详解"></a>二、profile设置详解</h2><p>​        <code>users.xml</code>用户配置文件中<code>profiles</code>部分定义了一些可复用的配置，他的作用类似于用户角色，可定义多个profile，并为不同的profile定义不同的配置，其中每个参数的含义可参考前面的参考网页二，并在后续使用中不断完善，以下面配置为例：</p>
+<h3 id="1、profile配置详情"><a href="#1、profile配置详情" class="headerlink" title="1、profile配置详情"></a>1、profile配置详情</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">yandex</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--定义profiles--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">profiles</span>&gt;</span>    </span><br><span class="line">        <span class="comment">&lt;!--可自定义名称，default是默认存在的角色名称--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">max_memory_usage</span>&gt;</span>10000000000<span class="tag">&lt;/<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">load_balancing</span>&gt;</span>random<span class="tag">&lt;/<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">          </span><br><span class="line">            <span class="tag">&lt;<span class="name">constraints</span>&gt;</span><span class="comment">&lt;!-- 配置约束--&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">min</span>&gt;</span>5000000000<span class="tag">&lt;/<span class="name">min</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">max</span>&gt;</span>20000000000<span class="tag">&lt;/<span class="name">max</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">max_memory_usage</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">readonly</span>/&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">load_balancing</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">constraints</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">      </span><br><span class="line">				<span class="comment">&lt;!--自定义readonly角色--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">readonly</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">readonly</span>&gt;</span>1<span class="tag">&lt;/<span class="name">readonly</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">readonly</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2、profile配置约束"><a href="#2、profile配置约束" class="headerlink" title="2、profile配置约束"></a>2、profile配置约束</h3><p>profile中有约束条件，从而限制其中的参数值被任意修改，约束条件有三种规则：</p>
+<ol>
+<li><p>Min：最小值约束，对应参数取值不能小于该值</p>
+</li>
+<li><p>Max：最大值约束，对应参数取值不能大雨该值</p>
+</li>
+<li><p>Readonly：只读约束，对应参数禁止修改</p>
+</li>
+</ol>
+<p>   <strong>profile中default的constraints配置约束会作为全局约束，自动被其他profile继承。</strong></p>
+<hr>
+<p>​        以上述配置示例，将default用户角色中的<code>max_memory_usage</code>设置了默认值以及最大最小阈值，<code>load_balancing</code>设置为了只读，对其配置进行测试</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxx docker_compose]<span class="comment"># docker exec -it 92b25e101be0 /bin/bash</span></span><br><span class="line"><span class="comment"># 所有的profile设置中，default是默认配置，必须存在，利用docker-compose配置后容器会无法启动</span></span><br><span class="line">root@clickhouse-server_1:/<span class="comment"># clickhouse-client</span></span><br><span class="line">ClickHouse client version 20.3.4.10 (official build).</span><br><span class="line">Connecting to localhost:9000 as user default.</span><br><span class="line">Connected to ClickHouse server version 20.3.4 revision 54433.</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置max_memory_usage为50，他的最小值约束起了作用，禁止修改为该值</span></span><br><span class="line">clickhouse-server_1 :) <span class="built_in">set</span> max_memory_usage = 50</span><br><span class="line"></span><br><span class="line">SET max_memory_usage = 50</span><br><span class="line"></span><br><span class="line">Received exception from server (version 20.3.4):</span><br><span class="line">Code: 452. DB::Exception: Received from localhost:9000. DB::Exception: Setting max_memory_usage shouldn<span class="string">'t be less than 5000000000. </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">0 rows in set. Elapsed: 0.058 sec.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">## 修改load_balancing，禁止修改该值</span></span><br><span class="line"><span class="string">clickhouse-server_1 :) set load_balancing = '</span>nearest_hostname<span class="string">'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">SET load_balancing = '</span>nearest_hostname<span class="string">'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">Received exception from server (version 20.3.4):</span></span><br><span class="line"><span class="string">Code: 452. DB::Exception: Received from localhost:9000. DB::Exception: Setting load_balancing should not be changed. </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">0 rows in set. Elapsed: 0.001 sec.</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3、profile切换和继承"><a href="#3、profile切换和继承" class="headerlink" title="3、profile切换和继承"></a>3、profile切换和继承</h3><p>1、profile切换</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 根据上面的配置文件，可以看到这次profile中包含default和readonly，clickhouse默认登陆用户为default，profile为default，可切换到readonly，切换后会获得相应的配置</span></span><br><span class="line">clickhouse-server_1 :) <span class="built_in">set</span> profile = <span class="string">'readonly'</span></span><br><span class="line"></span><br><span class="line">SET profile = <span class="string">'readonly'</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line">0 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.001 sec.</span><br><span class="line"><span class="comment"># 从上面配置可以看到，设置的max_memory_usage符合约束条件，但由于目前是readonly的profile，所有参数都不能修改</span></span><br><span class="line">clickhouse-server_1 :) <span class="built_in">set</span> max_memory_usage = 10000000001</span><br><span class="line"></span><br><span class="line">SET max_memory_usage = 10000000001</span><br><span class="line"></span><br><span class="line">Received exception from server (version 20.3.4):</span><br><span class="line">Code: 164. DB::Exception: Received from localhost:9000. DB::Exception: Cannot modify <span class="string">'max_memory_usage'</span> setting <span class="keyword">in</span> <span class="built_in">readonly</span> mode. </span><br><span class="line"></span><br><span class="line">0 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.001 sec.</span><br></pre></td></tr></table></figure>
+
+<p>2、profile继承</p>
+<p>​        profile配置支持继承，实现继承的方式是在profile配置中先引入其他的profile名称，但若有冲突，后面的配置会覆盖之前继承的配置，示例如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">profiles</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">test1</span>&gt;</span></span><br><span class="line">   	<span class="tag">&lt;<span class="name">allow_experimental_live_view</span>&gt;</span>1<span class="tag">&lt;/<span class="name">allow_experimental_live_view</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">distributed_product_mode</span>&gt;</span>allow<span class="tag">&lt;/<span class="name">distributed_product_mode</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">test1</span>&gt;</span></span><br><span class="line">   <span class="comment">&lt;!--normal_inherit profile会继承test1里面的两个参数配置，但它自身也设置了distributed_product_mode和test1的冲突，后面自己设置的deny会覆盖掉test1的allow设置--&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">normal_inherit</span>&gt;</span> </span><br><span class="line">   	<span class="tag">&lt;<span class="name">profile</span>&gt;</span>test1<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line">		<span class="tag">&lt;<span class="name">distributed_product_mode</span>&gt;</span>deny<span class="tag">&lt;/<span class="name">distributed_product_mode</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;/<span class="name">normal_inherit</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">profiles</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="三、users配置详解"><a href="#三、users配置详解" class="headerlink" title="三、users配置详解"></a>三、users配置详解</h2><p>​        <code>users.xml</code>用户配置文件中users模块可以自定义配置用户属性，例如用户名、密码、权限等，用官网默认配置会发现<code>users.xml</code>文件中会默认创建default用户，使用<code>clickhouse-client</code>无参数登陆会通过该用户登陆，将以下面的示例进行说明：</p>
+<h3 id="1、users配置详情"><a href="#1、users配置详情" class="headerlink" title="1、users配置详情"></a>1、users配置详情</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">users</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--default用户会默认存在--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">password</span>&gt;</span><span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">    				<span class="tag">&lt;<span class="name">ip</span>&gt;</span>127.0.0.1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!--下面两个用户为测试用户，可以不配置--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">seluser</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">password</span>&gt;</span>meiyoumima<span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::/0<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">profile</span>&gt;</span>readonly<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">seluser</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">inuser</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">password</span>&gt;</span>meiyoumima<span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::/0<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">inuser</span>&gt;</span></span><br><span class="line">  </span><br><span class="line"><span class="tag">&lt;/<span class="name">users</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2、users属性详解"><a href="#2、users属性详解" class="headerlink" title="2、users属性详解"></a>2、users属性详解</h3><p>​        一个完整的用户设置，需要包含下面的属性</p>
+<ul>
+<li>username：用户名</li>
+<li>password：密码设置</li>
+<li>networks：网络设置，一般用来限制可登陆的客户端地址</li>
+<li>profile：该用户所使用的profile</li>
+<li>quota</li>
+</ul>
+<hr>
+<p><strong>1. username</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">users</span>&gt;</span></span><br><span class="line">  	<span class="comment">&lt;!--用户的第一行设置为其username--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">password</span>&gt;</span><span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">networks</span> <span class="attr">incl</span>=<span class="string">"networks"</span> <span class="attr">replace</span>=<span class="string">"replace"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">ip</span>&gt;</span>::1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">    				<span class="tag">&lt;<span class="name">ip</span>&gt;</span>127.0.0.1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">networks</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"></span><br><span class="line">        <span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>2. password</strong></p>
+<p>​        登陆密码，clickhouse支持<strong>明文、SHA256加密、double_sha1</strong>三种设置方式，但SHA256和sha1都是散列算法，明文和密文一一对应，也可通过密文很容易进行解密…</p>
+<ul>
+<li>明文登陆</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--直接在用户中通过password标签定义，中间字符即为登陆密码--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">password</span>&gt;</span>meiyoumima<span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--类似上述default用户，中间为空即代表没有密码--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">password</span>&gt;</span><span class="tag">&lt;/<span class="name">password</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>SHA256加密登陆</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 官方推荐生成密码方式，RSZ4QZMc为随机的明文密码，21d076f...为最终密文</span></span><br><span class="line">[root@xxxx docker_compose]<span class="comment">#   PASSWORD=$(base64 &lt; /dev/urandom | head -c8); echo "$PASSWORD"; echo -n "$PASSWORD" | sha256sum | tr -d '-'</span></span><br><span class="line">RSZ4QZMc</span><br><span class="line">21d076f8340b5d836769a35c4d658d7b3091e7e1ccb18d66e9e1a7b6eef823df </span><br><span class="line"><span class="comment">### 也可通过openssl生成密文，明文为123，输出为密文</span></span><br><span class="line">[root@xxxx docker_compose]<span class="comment"># echo -n 123 | openssl dgst -sha256</span></span><br><span class="line">(stdin)= a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--设置方式--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">password_sha256_hex</span>&gt;</span>21d076f8340b5d836769a35c4d658d7b3091e7e1ccb18d66e9e1a7b6eef823df<span class="tag">&lt;/<span class="name">password_sha256_hex</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>double_sha1加密登陆</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 官方推荐生成密码方式，+0agrMRX为urandom生成的明文，407732...为最终密文</span></span><br><span class="line">[root@xxxx docker_compose]<span class="comment">#   PASSWORD=$(base64 &lt; /dev/urandom | head -c8); echo "$PASSWORD"; echo -n "$PASSWORD" | sha1sum | tr -d '-' | xxd -r -p | sha1sum | tr -d '-'</span></span><br><span class="line">+0agrMRX</span><br><span class="line">407732ce14cdea57dc0a2ff9c64773472f8cd666</span><br><span class="line"><span class="comment">### 通过openssl生成密文，明文为123，输出为密文</span></span><br><span class="line">[root@xxxx docker_compose]<span class="comment"># echo -n 123 | openssl dgst -sha1 -binary | openssl dgst -sha1</span></span><br><span class="line">(stdin)= 23ae809ddacaf96af0fd78ed04b6a265e05aa257</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--设置方式--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">password_double_sha1_hex</span>&gt;</span>407732ce14cdea57dc0a2ff9c64773472f8cd666<span class="tag">&lt;/<span class="name">password_double_sha1_hex</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>3. networks</strong></p>
+<p>​        networks表示允许被登陆clickhouse服务器的客户端列表，支持通过ip、host、host_regexp方式设置</p>
+<ul>
+<li>ip设置</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--通过ip直接设置--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ip</span>&gt;</span>1.1.1.1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ip</span>&gt;</span>10.0.0.1/8<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!--为所有客户端打开权限--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ip</span>&gt;</span>::/0<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--仅允许本地登陆--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ip</span>&gt;</span>::1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">ip</span>&gt;</span>127.0.0.1<span class="tag">&lt;/<span class="name">ip</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>host设置</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">host</span>&gt;</span>example1.host.com<span class="tag">&lt;/<span class="name">host</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>host_regexp设置</li>
+</ul>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--通过主机名的正则表达式设置--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">host_regexp</span>&gt;</span>^example\d\d-\d\d-\d\.host\.ru$<span class="tag">&lt;/<span class="name">host_regexp</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>4. profile设置</strong></p>
+<p>​        该用户所使用的profile设置，直接写入即可</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">default</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">profile</span>&gt;</span>default<span class="tag">&lt;/<span class="name">profile</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>5. quota设置</strong></p>
+<p>​        该用户单位时间内的资源限制，直接使用quotas设置的名称即可</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">quota</span>&gt;</span>default<span class="tag">&lt;/<span class="name">quota</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>6. database设置</strong></p>
+<p>​        该设置可以限制当前用户select时返回的行，以完成简单的行数据安全，示例如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--以下配置强制用户user1只能看到database_name.table1表中id为1000的行，其中filter支持UInt8类型的值，并支持比较和逻辑运算符--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">user1</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">databases</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">database_name</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">table1</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">filter</span>&gt;</span>id = 1000<span class="tag">&lt;/<span class="name">filter</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">table1</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">database_name</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">databases</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">user1</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="四、quotas配置详解"><a href="#四、quotas配置详解" class="headerlink" title="四、quotas配置详解"></a>四、quotas配置详解</h2><h3 id="1、quotas配置详情"><a href="#1、quotas配置详情" class="headerlink" title="1、quotas配置详情"></a>1、quotas配置详情</h3><p>​        <code>users.xml</code>配置文件中的quotas标签是限制了单位时间内的系统资源使用量，而不是限制单个查询的系统资源使用量<strong>(server的配置可以设置限制单个查询的系统资源的使用量)</strong>，值为0表示不限制，如下面示例所示，表示<strong>仅跟踪每小时的资源消耗，而不限制使用情况</strong>，当设置阈值之后，对应资源达到阈值，正在进行的操作也会中断。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">quotas</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">default</span>&gt;</span>		<span class="comment">&lt;!--自定义名称--&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">interval</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">duration</span>&gt;</span>3600<span class="tag">&lt;/<span class="name">duration</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">queries</span>&gt;</span>0<span class="tag">&lt;/<span class="name">queries</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">errors</span>&gt;</span>0<span class="tag">&lt;/<span class="name">errors</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">result_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">result_rows</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">read_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">read_rows</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">execution_time</span>&gt;</span>0<span class="tag">&lt;/<span class="name">execution_time</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">interval</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">default</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">quotas</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2、quotas属性详解"><a href="#2、quotas属性详解" class="headerlink" title="2、quotas属性详解"></a>2、quotas属性详解</h3><p><strong>1. duration设置</strong></p>
+<p>​        duration表示累计的时间周期，单位为秒，达到该时间周期后，清除所有收集的值，接下来的周期，将重新开始计算，当服务重启时，也会清除所有的值，重新开始新的周期。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">duration</span>&gt;</span>3600<span class="tag">&lt;/<span class="name">duration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>2. queris设置</strong></p>
+<p>​        queris表示在该周期内，允许执行的查询次数，0为不限制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--在duration设置周期时间内只允许查询1000次--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">queries</span>&gt;</span>1000<span class="tag">&lt;/<span class="name">queries</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>3. errors设置</strong></p>
+<p>​        errors表示在该周期内，允许引发异常的查询次数，0为不限制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">errors</span>&gt;</span>0<span class="tag">&lt;/<span class="name">errors</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>4. result_rows设置</strong></p>
+<p>​        result_rows表示在周期内，允许查询返回的结果行数，0为不限制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">result_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">result_rows</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>5. read_rows设置</strong></p>
+<p>​        read_rows表示在周期内，允许远程节点读取的数据行数，0为不限制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">read_rows</span>&gt;</span>0<span class="tag">&lt;/<span class="name">read_rows</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>6. execution_time设置</strong></p>
+<p>​        execution_time表示允许查询的总执行时间(又叫wall time)，单位为秒，0为不限制。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">execution_time</span>&gt;</span>0<span class="tag">&lt;/<span class="name">execution_time</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

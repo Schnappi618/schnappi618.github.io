@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        harbor配置nginx代理 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#一、设置原理"><span class="toc-text">一、设置原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#二、Nginx代理"><span class="toc-text">二、Nginx代理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#三、Harbor设置"><span class="toc-text">三、Harbor设置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#四、Web验证"><span class="toc-text">四、Web验证</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        harbor配置nginx代理
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-04-09 21:22:09</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#harbor" title="harbor">harbor</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​        从前面的文章<a href="https://schnappi618.github.io/2020/03/28/harbor%E6%90%AD%E5%BB%BAdocker%E7%A7%81%E6%9C%89%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93/">harbor搭建docker私有镜像仓库</a>可以看出harbor默认只能使用<code>harbor.yml</code>中hostname指定的ip或主机名作为web访问地址，但在实际使用过程中，一般不允许ip地址或者主机名直接暴露在外访问，故需要配置nginx代理，通过代理后指定的地址进行访问。</p>
+<hr>
+<h3 id="一、设置原理"><a href="#一、设置原理" class="headerlink" title="一、设置原理"></a>一、设置原理</h3><ul>
+<li>通过nginx为harbor后端暴露的地址及端口设置proxy地址，来源于harbor配置文件中的hostname及port</li>
+<li>修改harbor配置文件再次使用nginx设置的proxy地址</li>
+</ul>
+<hr>
+<h3 id="二、Nginx代理"><a href="#二、Nginx代理" class="headerlink" title="二、Nginx代理"></a>二、Nginx代理</h3><p>​        通过修改nginx的配置文件中server模块设置代理地址以及端口等信息，若harbor与nginx不在同一个服务器上或harbor不止一个服务器，还需要通过nginx的upstream模块来实现请求后端realserver及负载均衡，nginx配置文件修改处示例如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 设置upstream</span></span><br><span class="line">upstream harbor&#123;</span><br><span class="line">    server x.x.x.x:xx;			<span class="comment"># 后端harbor地址</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">## 设置代理后地址及监听端口等</span></span><br><span class="line">server &#123;</span><br><span class="line">    listen 80;		<span class="comment"># 代理后端口</span></span><br><span class="line">    server_name xx.xx.com;		<span class="comment"># 代理后访问地址</span></span><br><span class="line"></span><br><span class="line">    location /harbor &#123;</span><br><span class="line">        proxy_pass http://harbor;			<span class="comment"># 这里对应的是上面upstream后指定的名称</span></span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="三、Harbor设置"><a href="#三、Harbor设置" class="headerlink" title="三、Harbor设置"></a>三、Harbor设置</h3><p>​        通过nginx配置了代理之后，还需要修改harbor的配置文件设置proxy地址：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[root@xxxx</span> <span class="string">harbor]#</span> <span class="string">vim</span> <span class="string">harbor.yml</span></span><br><span class="line"><span class="comment"># Uncomment external_url if you want to enable external proxy</span></span><br><span class="line"><span class="comment"># And when it enabled the hostname will no longer used</span></span><br><span class="line"><span class="comment">## 打开该项配置，这里对应着nginx所设置的代理后访问地址</span></span><br><span class="line"><span class="attr">external_url:</span> <span class="string">http://xx.xx.com</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="四、Web验证"><a href="#四、Web验证" class="headerlink" title="四、Web验证"></a>四、Web验证</h3><p>​        通过浏览器访问<code>http://xx.xx.com:port</code>访问代理后地址，这里因为nginx代理后使用了80端口，所以不需要写明端口。</p>
+<p>​                                            <img src="/2020/04/09/harbor/harbor%E9%85%8D%E7%BD%AEnginx%E4%BB%A3%E7%90%86/1.jpg" style="zoom:70%;"></p>
+<p>​        至此，harbor配置nginx代理设置成功！</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

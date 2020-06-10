@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        ClickHouse存储引擎概述 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse引擎的作用"><span class="toc-text">一、ClickHouse引擎的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、ClickHouse表引擎分类"><span class="toc-text">二、ClickHouse表引擎分类</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        ClickHouse存储引擎概述
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-05-23 17:40:08</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#engine" title="engine">engine</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>本篇内容参考：<a href="https://clickhouse.tech/docs/zh/engines/table-engines/" target="_blank" rel="noopener">clickhouse官方文档</a></p>
+<h2 id="一、ClickHouse引擎的作用"><a href="#一、ClickHouse引擎的作用" class="headerlink" title="一、ClickHouse引擎的作用"></a>一、ClickHouse引擎的作用</h2><p>​    clickhouse表引擎的作用基本如下：</p>
+<ul>
+<li>数据的存储方式和位置：例如log系列引擎将数据写入在磁盘上，而Special系列的引擎将数据写入在内存上，但Distributed引擎并不存储书籍，仅作为中间件转发</li>
+<li>支持的哪些查询方式：例如log系列引擎不支持update和delete操作</li>
+<li>是否支持并发访问数据，是否可以执行多线程的请求：例如TinyLog引擎不支持并发读取，而Log引擎支持并发读取</li>
+<li>是否可以使用索引：例如log系列引擎并不支持使用索引</li>
+<li>数据如何进行复制：不同的存储引擎进行数据复制的参数完全不同</li>
+</ul>
+<h2 id="二、ClickHouse表引擎分类"><a href="#二、ClickHouse表引擎分类" class="headerlink" title="二、ClickHouse表引擎分类"></a>二、ClickHouse表引擎分类</h2><p>​    ClickHouse提供了大概27种适用于不同情况的表引擎，其中整体大概分为4类，分类大致如下图所示：</p>
+<img src="/2020/05/23/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/clickhouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E6%A6%82%E8%BF%B0/%E8%A1%A8%E5%BC%95%E6%93%8E.jpeg" style="zoom:30%;">
+
+<p>​    ClickHouse主要将表引擎分为了四类：</p>
+<ul>
+<li>MergeTree系列是主要适用的存储引擎，几乎可以支持clickhouse的所有功能使用</li>
+<li>Log系列主要适用于快速小表写入，全部读出的场景，但之间仍存在查询性能的区别</li>
+<li>Integration系列主要用于将外部数据导入到clickhosue中，或直接在clickhouse中处理其他的数据。例如之前使用过MySQL表引擎在clickhouse中连接到MySQL数据库，直接针对其数据进行查询</li>
+<li>Special系列大多数是为了一些特殊的场景来进行的处理：例如Distributed本身不存储数据，一般作为中间件执行数据聚合等操作返回给用户；Memory将数据写入到内存中，服务重启数据丢失，一般用来做临时表；Null直接将写入数据丢弃，读取时为空，但适合用来作为视图使用等。</li>
+</ul>
+<p>​    具体每类表引擎中各个引擎的区别及使用方法会在后续文档中分别进行描述，重点会在于MergeTree和log系列。其余引擎会简单描述其适用场景。</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

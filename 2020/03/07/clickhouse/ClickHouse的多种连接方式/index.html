@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        ClickHouse的多种连接方式 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse多种连接方式"><span class="toc-text">一、ClickHouse多种连接方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、HTTP接口连接ClickHouse"><span class="toc-text">二、HTTP接口连接ClickHouse</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、MySQL客户端连接ClickHouse"><span class="toc-text">三、MySQL客户端连接ClickHouse</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、可视界面连接ClickHouse"><span class="toc-text">四、可视界面连接ClickHouse</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        ClickHouse的多种连接方式
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-03-07 19:25:15</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h2 id="一、ClickHouse多种连接方式"><a href="#一、ClickHouse多种连接方式" class="headerlink" title="一、ClickHouse多种连接方式"></a>一、ClickHouse多种连接方式</h2><p>ClickHouse官方以及一些第三方提供了<a href="https://clickhouse.tech/docs/zh/interfaces/" target="_blank" rel="noopener">多种方式连接到服务端</a></p>
+<ul>
+<li>命令行接口：clickhouse-client</li>
+<li>HTTP接口</li>
+<li>MySQL客户端接口</li>
+<li>C++客户端</li>
+<li>JDBC驱动</li>
+<li>ODBC驱动</li>
+<li>第三方提供<ul>
+<li>各种客户端库：Python/Go/Perl/Ruby/……</li>
+<li>可视界面：Tabix/DataGrip/……</li>
+<li>集成产品：puppet/Prometheus/Zabbix/……</li>
+</ul>
+</li>
+</ul>
+<p>官方提供了许多方式连接到服务端，这里目前只测试了需要使用到的HTTP接口、MySQL客户端接口以及可视界面这几种方法，后续其他有需要再进行更新</p>
+<h2 id="二、HTTP接口连接ClickHouse"><a href="#二、HTTP接口连接ClickHouse" class="headerlink" title="二、HTTP接口连接ClickHouse"></a>二、HTTP接口连接ClickHouse</h2><p>2.1、修改配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 默认官方rpm包、docker等安装后提供的http端口为8123，可根据需要修改配置文件，默认配置文件路径为<span class="string">'/etc/clickhouse-server/config.xml'</span></span></span><br><span class="line">vim /etc/clickhouse-server/config.xml</span><br><span class="line">    &lt;http_port&gt;8123&lt;/http_port&gt;             ## 可将端口修改为需要的端口，重启clickhouse服务即可</span><br><span class="line"><span class="meta">#</span><span class="bash"> 利用rpm包等进行安装的重启服务即可</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 若利用docker安装需要在外部可以直接访问需要重新docker run并使用-p参数将容器端口映射到本地端口</span></span><br><span class="line">docker run -d --name clickhouse-test-server --ulimit nofile=262144:262144 -p 8123:8123 --volume=/work/clickhouse/clickhouse_test_db:/var/lib/clickhouse yandex/clickhouse-server</span><br></pre></td></tr></table></figure>
+
+<p>2.2、通过http接口访问</p>
+<p>2.2.1、端口检查</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl 'http://localhost:8123/'</span><br></pre></td></tr></table></figure>
+
+<p>2.2.2、接口使用</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> select 示例</span></span><br><span class="line">echo '1' | curl 'http://localhost:8123/?query=SELECT' --data-binary @-</span><br><span class="line"></span><br><span class="line">curl 'http://localhost:8123/?query=SELECT%201'</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 利用format指定输出格式</span></span></span><br><span class="line">echo 'SELECT 1 FORMAT Pretty' | curl 'http://localhost:8123/?' --data-binary @-</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 创建数据必须通过post接口实现</span></span><br><span class="line">echo 'INSERT INTO t VALUES (1),(2),(3)' | POST 'http://localhost:8123/'</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/03/07/clickhouse/ClickHouse%E7%9A%84%E5%A4%9A%E7%A7%8D%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F/1.png" style="zoom:33%;">
+
+<h2 id="三、MySQL客户端连接ClickHouse"><a href="#三、MySQL客户端连接ClickHouse" class="headerlink" title="三、MySQL客户端连接ClickHouse"></a>三、MySQL客户端连接ClickHouse</h2><p>​        目前MySQL数据库使用率比较高，通过以下方法可以直接从MySQL客户端直接连接到ClickHouse</p>
+<p>3.1、修改配置文件</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 在配置文件中新增mysql端口</span></span><br><span class="line">vim /etc/clickhouse-server/config.xml</span><br><span class="line">    &lt;mysql_port&gt;9004&lt;/mysql_port&gt;            ## 开启mysql接口，但此时仅可以本地访问</span><br><span class="line">    ## 若需要其他ip访问，添加下面配置，并写入允许访问地址</span><br><span class="line">    &lt;listen_host&gt;::&lt;/listen_host&gt;            ## 开启对应的可访问地址</span><br><span class="line">    </span><br><span class="line"><span class="meta">#</span><span class="bash"> 配置完成后重启服务即可</span></span><br></pre></td></tr></table></figure>
+
+<p>3.2、MySQL连接ClickHouse</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql --protocol tcp -u default -P 9004 -h[服务器ip]</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/03/07/clickhouse/ClickHouse%E7%9A%84%E5%A4%9A%E7%A7%8D%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F/2.png" style="zoom:25%;">
+
+<h2 id="四、可视界面连接ClickHouse"><a href="#四、可视界面连接ClickHouse" class="headerlink" title="四、可视界面连接ClickHouse"></a>四、可视界面连接ClickHouse</h2><p>​        很多软件官方都提供了clickhouse的连接方法，仅对web页面tabix以及DataGrip连接做了测试，配置好的页面如下：</p>
+<p>其余方法可参考官方提供的入口：<a href="https://clickhouse.tech/docs/zh/interfaces/third-party/gui/" target="_blank" rel="noopener">https://clickhouse.tech/docs/zh/interfaces/third-party/gui/</a></p>
+<p>4.1、tabix连接</p>
+<p>​    <strong>使用tabix连接必须打开ClickHouse的HTTP连接接口</strong></p>
+<p>​    <a href="http://ui.tabix.io/#!/login" target="_blank" rel="noopener">tabix访问页面</a></p>
+<p>​    输入对应配置即可看到对应数据库界面：</p>
+<img src="/2020/03/07/clickhouse/ClickHouse%E7%9A%84%E5%A4%9A%E7%A7%8D%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F/3.png" style="zoom:25%;">
+
+<img src="/2020/03/07/clickhouse/ClickHouse%E7%9A%84%E5%A4%9A%E7%A7%8D%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F/4.png" style="zoom:25%;">
+
+<p>4.2、DataGrip连接测试</p>
+<p>​        和tabix连接类似，新增数据库类型为ClickHouse并输入配置参数连接即可，最终效果图如下：</p>
+<img src="/2020/03/07/clickhouse/ClickHouse%E7%9A%84%E5%A4%9A%E7%A7%8D%E8%BF%9E%E6%8E%A5%E6%96%B9%E5%BC%8F/5.png" style="zoom:33%;">
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        harbor配置https - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、自签证书"><span class="toc-text">一、自签证书</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、生成CA证书"><span class="toc-text">1、生成CA证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、生成服务器证书"><span class="toc-text">2、生成服务器证书</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、harbor配置修改"><span class="toc-text">3、harbor配置修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4、harbor重新导入配置并启动"><span class="toc-text">4、harbor重新导入配置并启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5、浏览器访问测试"><span class="toc-text">5、浏览器访问测试</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        harbor配置https
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-04-20 17:44:46</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#harbor" title="harbor">harbor</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <ul>
+<li>参考网页：<a href="https://goharbor.io/docs/1.10/install-config/configure-https/" target="_blank" rel="noopener">harbor配置https官方文档</a></li>
+</ul>
+<p>​        在前面<a href="https://schnappi618.github.io/2020/03/28/harbor搭建docker私有镜像仓库/">harbor搭建docker私有镜像仓库</a>中使用了默认的http端口，但生产环境中并不提倡使用不安全的http服务，建议使用https保证安全性，这里根据官方推荐的openssl方法来自签证书，但浏览器并不认可自签证书的安全性，所以浏览器需要添加颁发的证书到浏览器中。同时，也可使用官方推荐的ACME获取免费的SSL证书。</p>
+<h2 id="一、自签证书"><a href="#一、自签证书" class="headerlink" title="一、自签证书"></a>一、自签证书</h2><h3 id="1、生成CA证书"><a href="#1、生成CA证书" class="headerlink" title="1、生成CA证书"></a>1、生成CA证书</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">mkdir /Users/bulubulu/docker/cert			<span class="comment"># 创建一个放置证书相关的目录，并使用cd进入该目录</span></span><br><span class="line"><span class="comment">## 1. 生成CA证书私钥</span></span><br><span class="line">openssl genrsa -out ca.key 4096</span><br><span class="line"><span class="comment">## 2. 生成CA证书，可调整 -subj 选项来表明域名名称等信息</span></span><br><span class="line">openssl req -x509 -new -nodes -sha512 -days 3650 \</span><br><span class="line"> -subj <span class="string">"/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=harbor.test.com"</span> \</span><br><span class="line"> -key ca.key \</span><br><span class="line"> -out ca.crt</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、生成服务器证书"><a href="#2、生成服务器证书" class="headerlink" title="2、生成服务器证书"></a>2、生成服务器证书</h3><p>​        认证证书通常包含证书请求<code>.csr</code>文件、签名证书<code>.crt</code>文件及私钥<code>.key</code>文件，我这里harbor配置的hostname是harbor.test.com，所以最终需要生成<code>harbor.test.com.crt、harbor.test.com.csr、harbor.test.com.key</code>三个文件。</p>
+<ul>
+<li>key：证书私钥，一般利用rsa等算法生成</li>
+<li>csr：证书请求文件，利用证书私钥生成证书请求文件，该文件包含了服务器和地址等信息，申请人将该文件提交给CA机构，CA机构会根据该文件所携带的私钥信息来进行签名生成证书</li>
+<li>crt：证书文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 1. 生成私钥</span></span><br><span class="line">openssl genrsa -out harbor.test.com.key 4096</span><br><span class="line"><span class="comment">## 2. 生成csr文件</span></span><br><span class="line">openssl req -sha512 -new \</span><br><span class="line">    -subj <span class="string">"/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=harbor.test.com"</span> \</span><br><span class="line">    -key harbor.test.com.key \</span><br><span class="line">    -out harbor.test.com.csr</span><br><span class="line"><span class="comment">## 3. 生成ssl匹配多域名文，例如既想使用域名又需要通过127.0.0.1本地地址登陆测试，可使用subjectAltName参数来进行配置</span></span><br><span class="line">cat &gt; v3.ext &lt;&lt;-EOF</span><br><span class="line">authorityKeyIdentifier=keyid,issuer</span><br><span class="line">basicConstraints=CA:FALSE</span><br><span class="line">keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment</span><br><span class="line">extendedKeyUsage = serverAuth</span><br><span class="line">subjectAltName = @alt_names</span><br><span class="line"></span><br><span class="line">[alt_names]</span><br><span class="line">DNS.1=harbor.test.com</span><br><span class="line">DNS.2=127.0.0.1</span><br><span class="line">EOF</span><br><span class="line"><span class="comment">## 4. 根据v3.ext及csr文件请求生成crt证书文件</span></span><br><span class="line">openssl x509 -req -sha512 -days 3650 \</span><br><span class="line">    -extfile v3.ext \</span><br><span class="line">    -CA ca.crt -CAkey ca.key -CAcreateserial \</span><br><span class="line">    -<span class="keyword">in</span> harbor.test.com.csr \</span><br><span class="line">    -out harbor.test.com.crt</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、harbor配置修改"><a href="#3、harbor配置修改" class="headerlink" title="3、harbor配置修改"></a>3、harbor配置修改</h3><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">vim</span> <span class="string">harbor.yml</span></span><br><span class="line"><span class="attr">hostname:</span> <span class="string">harbor.test.com</span></span><br><span class="line"><span class="comment"># https related config</span></span><br><span class="line"><span class="attr">https:</span></span><br><span class="line">  <span class="comment"># https port for harbor, default is 443</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">443</span></span><br><span class="line">  <span class="comment"># The path of cert and key files for nginx</span></span><br><span class="line">  <span class="attr">certificate:</span> <span class="string">/Users/bulubulu/docker/cert/harbor.test.com.crt</span></span><br><span class="line">  <span class="attr">private_key:</span> <span class="string">/Users/bulubulu/docker/cert/harbor.test.com.key</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4、harbor重新导入配置并启动"><a href="#4、harbor重新导入配置并启动" class="headerlink" title="4、harbor重新导入配置并启动"></a>4、harbor重新导入配置并启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 在harbor安装目录下执行以下命令重新启动</span></span><br><span class="line">docker-compose down -v</span><br><span class="line">./prepare</span><br><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+<h3 id="5、浏览器访问测试"><a href="#5、浏览器访问测试" class="headerlink" title="5、浏览器访问测试"></a>5、浏览器访问测试</h3><p>​        在浏览器通过所设置域名及ip分别进行测试</p>
+<p><img src="/2020/04/20/harbor/harbor%E9%85%8D%E7%BD%AEhttps/3.png" alt="访问harbor.test.com"></p>
+<p><img src="/2020/04/20/harbor/harbor%E9%85%8D%E7%BD%AEhttps/2.png" alt="访问127.0.0.1"></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

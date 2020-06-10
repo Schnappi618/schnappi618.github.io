@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        clickhouse的docker架构 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse的docker文件架构"><span class="toc-text">一、ClickHouse的docker文件架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、server内容详解"><span class="toc-text">二、server内容详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1、Dockerfile文件内容"><span class="toc-text">2.1、Dockerfile文件内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-docker-related-config-xml文件内容"><span class="toc-text">2.2 docker_related_config.xml文件内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3、entrypoint-sh文件内容"><span class="toc-text">2.3、entrypoint.sh文件内容</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-4、local-Dockerfile文件"><span class="toc-text">2.4、local.Dockerfile文件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-5-server镜像打包"><span class="toc-text">2.5 server镜像打包</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、client内容详解"><span class="toc-text">三、client内容详解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1、Dockerfile文件内容"><span class="toc-text">3.1、Dockerfile文件内容</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        clickhouse的docker架构
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-03-21 17:32:30</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​        由于最终选用了docker方法安装了clickhouse，便从github下载了<a href="https://github.com/ClickHouse/ClickHouse/" target="_blank" rel="noopener">clickhouse源码</a>，对clickhouse提供的docker目录结构进行了解，并且积累有关docker的知识(本文仅会通过clickhouse本身的Dockerfile文件简单描述其中使用到的各个命令的作用及在当前使用的情况，详细关于Dockerfile中指令的作用示例等会在之后的docker部分中进行学习描述^_^)，从而方便之后修改打包出需要的镜像。</p>
+<h2 id="一、ClickHouse的docker文件架构"><a href="#一、ClickHouse的docker文件架构" class="headerlink" title="一、ClickHouse的docker文件架构"></a>一、ClickHouse的docker文件架构</h2><p>​        clickhouse关于docker的文件目录分为builder、client、packager、server、test以及外层的docker-compose.yml文件，docker目录的树状结构如下：</p>
+<details>
+  <summary><font>docker文件目录</font></summary>
+  <pre><code>  
+docker
+├── README.md
+├── builder                            # gcc-9/ninja/cmake... 等基础环境的安装
+│   ├── Dockerfile
+│   ├── Makefile
+│   ├── README.md
+│   └── build.sh
+├── client                            # 安装clickhouse client
+│   ├── Dockerfile
+│   └── README.md
+├── images.json
+├── packager
+│   ├── README.md
+│   ├── binary
+│   │   ├── Dockerfile
+│   │   └── build.sh
+│   ├── deb
+│   │   ├── Dockerfile
+│   │   └── build.sh
+│   ├── freebsd
+│   │   └── Vagrantfile
+│   └── packager
+├── server                        # 安装配置clickhouse server
+│   ├── Dockerfile
+│   ├── README.md
+│   ├── docker_related_config.xml
+│   ├── entrypoint.sh
+│   └── local.Dockerfile
+└── test                            # 用于测试使用
+    ├── Dockerfile
+    ├── README.md
+    ├── codebrowser
+    │   └── Dockerfile
+    ├── compatibility
+    │   ├── centos
+    │   │   └── Dockerfile
+    │   └── ubuntu
+    │       └── Dockerfile
+    ├── coverage
+    │   └── Dockerfile
+    ├── integration
+    │   └── Dockerfile
+    ├── performance
+    │   ├── Dockerfile
+    │   ├── run.sh
+    │   └── s3downloader
+    ├── performance-comparison
+    │   ├── Dockerfile
+    │   ├── compare.sh
+    │   ├── config
+    │   │   ├── config.d
+    │   │   │   └── perf-comparison-tweaks-config.xml
+    │   │   └── users.d
+    │   │       └── perf-comparison-tweaks-users.xml
+    │   ├── download.sh
+    │   ├── entrypoint.sh
+    │   ├── eqmed.sql
+    │   ├── perf.py
+    │   ├── performance_comparison.md
+    │   └── report.py
+    ├── pvs
+    │   └── Dockerfile
+    ├── split_build_smoke_test
+    │   ├── Dockerfile
+    │   └── run.sh
+    ├── stateful
+    │   ├── Dockerfile
+    │   └── s3downloader
+    ├── stateful_with_coverage
+    │   ├── Dockerfile
+    │   ├── run.sh
+    │   └── s3downloader
+    ├── stateless
+    │   ├── Dockerfile
+    │   └── clickhouse-statelest-test-runner.Dockerfile
+    ├── stateless_with_coverage
+    │   ├── Dockerfile
+    │   └── run.sh
+    ├── stress
+    │   ├── Dockerfile
+    │   ├── README.md
+    │   └── stress
+    ├── test_runner.sh
+    ├── test_runner_docker_compose.yaml
+    └── unit
+        └── Dockerfile
+  </code></pre>
+</details>
+
+<h2 id="二、server内容详解"><a href="#二、server内容详解" class="headerlink" title="二、server内容详解"></a>二、server内容详解</h2><p>​        ClickHouse docker的server目录包含了：Dockerfile、README.md、docker_related_config.xml、entrypoint.sh、local.Dockerfile这些文件，其中README.md简单介绍了如何通过docker启动clickhouse服务等基本应用，将从Dockerfile文件内容入手从而解释其他文件的作用。</p>
+<h3 id="2-1、Dockerfile文件内容"><a href="#2-1、Dockerfile文件内容" class="headerlink" title="2.1、Dockerfile文件内容"></a>2.1、Dockerfile文件内容</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu:<span class="number">18.04</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## ARG 构建参数： repository、version、gosu_ver</span></span><br><span class="line"><span class="keyword">ARG</span> repository=<span class="string">"deb http://repo.yandex.ru/clickhouse/deb/stable/ main/"</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 官方目前还没有clickhouse-common-statis/client/server的20.4.1.*这个版本，改为version=20.3.4.*即可docker build打包镜像</span></span><br><span class="line"><span class="keyword">ARG</span> version=<span class="number">20.4</span>.<span class="number">1</span>.*</span><br><span class="line"><span class="keyword">ARG</span> gosu_ver=<span class="number">1.10</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## RUN 执行命令：安装基础命令及clickhouse-client/clickhouse-server/clickhouse-common-static...</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">        apt-transport-https \</span></span><br><span class="line"><span class="bash">        dirmngr \</span></span><br><span class="line"><span class="bash">        gnupg \</span></span><br><span class="line"><span class="bash">    &amp;&amp; mkdir -p /etc/apt/sources.list.d \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-key adv --keyserver keyserver.ubuntu.com --recv E0C56BD4 \</span></span><br><span class="line"><span class="bash">    &amp;&amp; <span class="built_in">echo</span> <span class="variable">$repository</span> &gt; /etc/apt/sources.list.d/clickhouse.list \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; env DEBIAN_aFRONTEND=noninteractive \</span></span><br><span class="line"><span class="bash">        apt-get install --allow-unauthenticated --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">            clickhouse-common-static=<span class="variable">$version</span> \</span></span><br><span class="line"><span class="bash">            clickhouse-client=<span class="variable">$version</span> \</span></span><br><span class="line"><span class="bash">            clickhouse-server=<span class="variable">$version</span> \</span></span><br><span class="line"><span class="bash">            locales \</span></span><br><span class="line"><span class="bash">            tzdata \</span></span><br><span class="line"><span class="bash">            wget \</span></span><br><span class="line"><span class="bash">    &amp;&amp; rm -rf \</span></span><br><span class="line"><span class="bash">        /var/lib/apt/lists/* \</span></span><br><span class="line"><span class="bash">        /var/cache/debconf \</span></span><br><span class="line"><span class="bash">        /tmp/* \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get clean</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## ADD: 将github上的gosu-amd64下载为/bin/gosu文件, gosu类似于linux中的sudo命令</span></span><br><span class="line"><span class="keyword">ADD</span><span class="bash"> https://github.com/tianon/gosu/releases/download/<span class="variable">$gosu_ver</span>/gosu-amd64 /bin/gosu</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 语言环境修改</span></span><br><span class="line"><span class="comment">## 生成需要的locale文件</span></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> locale-gen en_US.UTF-8</span></span><br><span class="line"><span class="comment">## ENV：设置环境变量</span></span><br><span class="line"><span class="keyword">ENV</span> LANG en_US.UTF-<span class="number">8</span></span><br><span class="line"><span class="keyword">ENV</span> LANGUAGE en_US:en</span><br><span class="line"><span class="keyword">ENV</span> LC_ALL en_US.UTF-<span class="number">8</span></span><br><span class="line"><span class="keyword">ENV</span> TZ UTC</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> mkdir /docker-entrypoint-initdb.d</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## COPY：复制文件，eg：将docker_related_config.xml文件复制到/etc/clickhouse-server/config.d/目录下，不需要提前创建目标目录，若不存在，COPY会自动创建</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> docker_related_config.xml /etc/clickhouse-server/config.d/</span></span><br><span class="line"><span class="keyword">COPY</span><span class="bash"> entrypoint.sh /entrypoint.sh</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> chmod +x \</span></span><br><span class="line"><span class="bash">    /entrypoint.sh \</span></span><br><span class="line"><span class="bash">    /bin/gosu</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## EXPOSE：暴露端口，仅声明容器运行时应该打开哪些服务端口，方便启动docker run -p时配置映射关系</span></span><br><span class="line"><span class="keyword">EXPOSE</span> <span class="number">9000</span> <span class="number">8123</span> <span class="number">9009</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## VOLUME: 数据持久化，会将启动后容器/var/lib/clickhouse目录下的数据写入到宿主机上，如果docker run时指定了--volume=/work/docker/clickhouse_test_db:/var/lib/clickhouse，便会同步至宿主机的/work/docker/clickhouse_test_db目录，若未指定会写入宿主机docker info的Docker Root Dir目录下</span></span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> /var/lib/clickhouse</span></span><br><span class="line"></span><br><span class="line"><span class="comment">## 设置CLICKHOUSE_CONFIG环境变量</span></span><br><span class="line"><span class="keyword">ENV</span> CLICKHOUSE_CONFIG /etc/clickhouse-server/config.xml</span><br><span class="line"></span><br><span class="line"><span class="comment">## ENTRYPOINT ["shell脚本"]：执行容器运行前的一些准备工作</span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">"/entrypoint.sh"</span>]</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-docker-related-config-xml文件内容"><a href="#2-2-docker-related-config-xml文件内容" class="headerlink" title="2.2 docker_related_config.xml文件内容"></a>2.2 docker_related_config.xml文件内容</h3><p>​        从Dockerfile中可以看到，docker_related_config.xml文件会被放置在clickhouse-server的配置目录<code>/etc/clickhouse-server/config.d/</code>下，用来配置clickhouse-server容器的监听地址，默认配置允许接受来自其他容器和主机网络的连接。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">yandex</span>&gt;</span></span><br><span class="line">     <span class="comment">&lt;!-- Listen wildcard address to allow accepting connections from other containers and host network. --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listen_host</span>&gt;</span>::<span class="tag">&lt;/<span class="name">listen_host</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listen_host</span>&gt;</span>0.0.0.0<span class="tag">&lt;/<span class="name">listen_host</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">listen_try</span>&gt;</span>1<span class="tag">&lt;/<span class="name">listen_try</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">&lt;!--</span></span><br><span class="line"><span class="comment">    &lt;logger&gt;</span></span><br><span class="line"><span class="comment">        &lt;console&gt;1&lt;/console&gt;</span></span><br><span class="line"><span class="comment">    &lt;/logger&gt;</span></span><br><span class="line"><span class="comment">    --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">yandex</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3、entrypoint-sh文件内容"><a href="#2-3、entrypoint-sh文件内容" class="headerlink" title="2.3、entrypoint.sh文件内容"></a>2.3、entrypoint.sh文件内容</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span><br><span class="line">DO_CHOWN=1</span><br><span class="line">if [ "$CLICKHOUSE_DO_NOT_CHOWN" = 1 ]; then</span><br><span class="line">    DO_CHOWN=0</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">CLICKHOUSE_UID="$&#123;CLICKHOUSE_UID:-"$(id -u clickhouse)"&#125;"</span><br><span class="line">CLICKHOUSE_GID="$&#123;CLICKHOUSE_GID:-"$(id -g clickhouse)"&#125;"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> support --user</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 设置USER/GROUP为clickhouse</span></span></span><br><span class="line">if [ x"$UID" == x0 ]; then</span><br><span class="line">    USER=$CLICKHOUSE_UID</span><br><span class="line">    GROUP=$CLICKHOUSE_GID</span><br><span class="line">    gosu="gosu $USER:$GROUP"</span><br><span class="line">else</span><br><span class="line">    USER="$(id -u)"</span><br><span class="line">    GROUP="$(id -g)"</span><br><span class="line">    gosu=""</span><br><span class="line">    DO_CHOWN=0</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="built_in">set</span> some vars</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 配置文件 /etc/clickhouse-server/config.xml</span></span></span><br><span class="line">CLICKHOUSE_CONFIG="$&#123;CLICKHOUSE_CONFIG:-/etc/clickhouse-server/config.xml&#125;"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> port is needed to check <span class="keyword">if</span> clickhouse-server is ready <span class="keyword">for</span> connections</span></span><br><span class="line">HTTP_PORT="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=http_port)"</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> get CH directories locations</span></span><br><span class="line">DATA_DIR="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=path || true)"</span><br><span class="line">TMP_DIR="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=tmp_path || true)"</span><br><span class="line">USER_PATH="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=user_files_path || true)"</span><br><span class="line">LOG_PATH="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=logger.log || true)"</span><br><span class="line">LOG_DIR="$(dirname $LOG_PATH || true)"</span><br><span class="line">ERROR_LOG_PATH="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=logger.errorlog || true)"</span><br><span class="line">ERROR_LOG_DIR="$(dirname $ERROR_LOG_PATH || true)"</span><br><span class="line">FORMAT_SCHEMA_PATH="$(clickhouse extract-from-config --config-file $CLICKHOUSE_CONFIG --key=format_schema_path || true)"</span><br><span class="line">CLICKHOUSE_USER="$&#123;CLICKHOUSE_USER:-default&#125;"</span><br><span class="line"></span><br><span class="line">for dir in "$DATA_DIR" \</span><br><span class="line">  "$ERROR_LOG_DIR" \</span><br><span class="line">  "$LOG_DIR" \</span><br><span class="line">  "$TMP_DIR" \</span><br><span class="line">  "$USER_PATH" \</span><br><span class="line">  "$FORMAT_SCHEMA_PATH"</span><br><span class="line">do</span><br><span class="line">    # check if variable not empty</span><br><span class="line">    [ -z "$dir" ] &amp;&amp; continue</span><br><span class="line">    # ensure directories exist</span><br><span class="line">    if ! mkdir -p "$dir"; then</span><br><span class="line">        echo "Couldn't create necessary directory: $dir"</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    if [ "$DO_CHOWN" = "1" ]; then</span><br><span class="line">        # ensure proper directories permissions</span><br><span class="line">        chown -R "$USER:$GROUP" "$dir"</span><br><span class="line">    elif [ "$(stat -c %u "$dir")" != "$USER" ]; then</span><br><span class="line">        echo "Necessary directory '$dir' isn't owned by user with id '$USER'"</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if [ -n "$(ls /docker-entrypoint-initdb.d/)" ]; then</span><br><span class="line">    $gosu /usr/bin/clickhouse-server --config-file=$CLICKHOUSE_CONFIG &amp;</span><br><span class="line">    pid="$!"</span><br><span class="line"></span><br><span class="line">    # check if clickhouse is ready to accept connections</span><br><span class="line">    # will try to send ping clickhouse via http_port (max 12 retries, with 1 sec delay)</span><br><span class="line">    if ! wget --spider --quiet --tries=12 --waitretry=1 --retry-connrefused "http://localhost:$HTTP_PORT/ping" ; then</span><br><span class="line">        echo &gt;&amp;2 'ClickHouse init process failed.'</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    if [ ! -z "$CLICKHOUSE_PASSWORD" ]; then</span><br><span class="line">        printf -v WITH_PASSWORD '%s %q' "--password" "$CLICKHOUSE_PASSWORD"</span><br><span class="line">    fi</span><br><span class="line"></span><br><span class="line">    clickhouseclient=( clickhouse-client --multiquery -u $CLICKHOUSE_USER $WITH_PASSWORD )</span><br><span class="line"></span><br><span class="line">    echo</span><br><span class="line">    for f in /docker-entrypoint-initdb.d/*; do</span><br><span class="line">        case "$f" in</span><br><span class="line">            *.sh)</span><br><span class="line">                if [ -x "$f" ]; then</span><br><span class="line">                    echo "$0: running $f"</span><br><span class="line">                    "$f"</span><br><span class="line">                else</span><br><span class="line">                    echo "$0: sourcing $f"</span><br><span class="line">                    . "$f"</span><br><span class="line">                fi</span><br><span class="line">                ;;</span><br><span class="line">            *.sql)    echo "$0: running $f"; cat "$f" | "$&#123;clickhouseclient[@]&#125;" ; echo ;;</span><br><span class="line">            *.sql.gz) echo "$0: running $f"; gunzip -c "$f" | "$&#123;clickhouseclient[@]&#125;"; echo ;;</span><br><span class="line">            *)        echo "$0: ignoring $f" ;;</span><br><span class="line">        esac</span><br><span class="line">        echo</span><br><span class="line">    done</span><br><span class="line"></span><br><span class="line">    if ! kill -s TERM "$pid" || ! wait "$pid"; then</span><br><span class="line">        echo &gt;&amp;2 'Finishing of ClickHouse init process failed.'</span><br><span class="line">        exit 1</span><br><span class="line">    fi</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">if</span> no args passed to `docker run` or first argument start with `--`, <span class="keyword">then</span> the user is passing clickhouse-server arguments</span></span><br><span class="line">if [[ $# -lt 1 ]] || [[ "$1" == "--"* ]]; then</span><br><span class="line">    exec $gosu /usr/bin/clickhouse-server --config-file=$CLICKHOUSE_CONFIG "$@"</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> Otherwise, we assume the user want to run his own process, <span class="keyword">for</span> example a `bash` shell to explore this image</span></span><br><span class="line">exec "$@"</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-4、local-Dockerfile文件"><a href="#2-4、local-Dockerfile文件" class="headerlink" title="2.4、local.Dockerfile文件"></a>2.4、local.Dockerfile文件</h3><p>​        暂时保留，未发现使用该文件的地方</p>
+<h3 id="2-5-server镜像打包"><a href="#2-5-server镜像打包" class="headerlink" title="2.5 server镜像打包"></a>2.5 server镜像打包</h3><p>​        根据clickhouse-server的docker源代码发现Dockerfile、entrypoint.sh、docker_related_config.xml三个文件为docker必需文件，新建一个目录，只写入这三个文件后，对原生server镜像进行打包。</p>
+<p>​                                    <img src="/2020/03/21/clickhouse/clickhouse%E7%9A%84docker%E6%9E%B6%E6%9E%84/1.png" alt="镜像打包目录架构" style="zoom:50%;"></p>
+<p>​        上图为镜像打包准备目录的架构，确保docker服务启动后使用<code>docker build -t clickhouse-server-demo:1.0 .</code>打包镜像名为clickhouse-server-demo，tag为1.0的docker镜像。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 打包镜像</span></span></span><br><span class="line">[root... test-clickhouse]# docker build -t clickhouse-server-demo:1.0 .</span><br><span class="line">Sending build context to Docker daemon 8.704 kB</span><br><span class="line">Step 1/19 : FROM ubuntu:18.04</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">Successfully built 16acf3ee797d							## 当最终出现打包镜像成功表示docker build完成</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 若打包失败处理方法(本次打包过程中从github下载源代码版本较新，官方deb包还未更新，出现过打包失败的情况)：</span></span></span><br><span class="line">[root... test-clickhouse]# docker build -t clickhouse-server-demo:1.0 .</span><br><span class="line">...</span><br><span class="line">E: Version '20.4.1.*' for 'clickhouse-common-static' was not found</span><br><span class="line">E: Version '20.4.1.*' for 'clickhouse-client' was not found</span><br><span class="line">E: Version '20.4.1.*' for 'clickhouse-server' was not found</span><br><span class="line">The command '/bin/sh -c apt-get update     &amp;&amp; apt-get install --yes --no-install-recommends         apt-transport-https         dirmngr         gnupg     &amp;&amp; mkdir -p /etc/apt/sources.list.d     &amp;&amp; apt-key adv --keyserver keyserver.ubuntu.com --recv E0C56BD4     &amp;&amp; echo $repository &gt; /etc/apt/sources.list.d/clickhouse.list     &amp;&amp; apt-get update     &amp;&amp; env DEBIAN_FRONTEND=noninteractive         apt-get install --allow-unauthenticated --yes --no-install-recommends             clickhouse-common-static=$version             clickhouse-client=$version             clickhouse-server=$version             locales             tzdata             wget     &amp;&amp; rm -rf         /var/lib/apt/lists/*  </span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 以上报错表示clickhouse-server/client..未找到20.4.1.*的包，在执行Dockerfile中的/bin/sh -c apt-get update...命令执行失败</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### 1. 通过`docker image ls`的命令看到并未打包镜像成功，其中image id为289a...</span></span></span><br><span class="line">[root... test-clickhouse]# docker image ls</span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">&lt;none&gt;              &lt;none&gt;              9feb83a76f47        8 minutes ago       64.2 MB</span><br><span class="line">ubuntu              18.04               4e5021d210f6        37 hours ago        64.2 MB</span><br><span class="line">hello-world         latest              fce289e99eb9        14 months ago       1.84 kB</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">### 2. 通过`docker run -it 9feb83a76f47 /bin/bash`进入目前已打包的镜像中，执行失败的命令，查看报错原因</span></span></span><br><span class="line">[root... test-clickhouse]# docker run -it 9feb83a76f47 /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 进入后可通过执行命令查看打包失败原因</span></span></span><br><span class="line">root@8974a71311f5:/# apt-get update     &amp;&amp; apt-get install --yes --no-install-recommends         apt-transport-https         dirmngr         gnupg     &amp;&amp; mkdir -p /etc/apt/sources.list.d     &amp;&amp; apt-key adv --keyserver keyserver.ubuntu.com --recv E0C56BD4     &amp;&amp; echo $repository &gt; /etc/apt/sources.list.d/clickhouse.list     &amp;&amp; apt-get update     &amp;&amp; env DEBIAN_FRONTEND=noninteractive         apt-get install --allow-unauthenticated --yes --no-install-recommends             clickhouse-common-static=$version             clickhouse-client=$version             clickhouse-server=$version             locales             tzdata             wget     &amp;&amp; rm -rf         /var/lib/apt/lists/*         /var/cache/debconf         /tmp/*     &amp;&amp; apt-get clean</span><br><span class="line">...</span><br><span class="line">E: Unable to locate package clickhouse-common-static</span><br><span class="line">E: Unable to locate package clickhouse-client</span><br><span class="line">E: Unable to locate package clickhouse-server</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 由执行结果看到是由于没有找到clickhouse-server/client/common-static这三个包，通过查看命令可以看到，安装这三个包时指定了版本为Dockerfile初始化的version值，可能是由于version版本过高导致</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 可以通过不指定版本安装查看是否是由于版本过高导致，通过结果可以看到，会得到的版本是20.3.4.10</span></span></span><br><span class="line">root@8974a71311f5:/# apt-get install --allow-unauthenticated --yes --no-install-recommends clickhouse-common-static</span><br><span class="line">Reading package lists... Done</span><br><span class="line">Building dependency tree       </span><br><span class="line">Reading state information... Done</span><br><span class="line">The following additional packages will be installed:</span><br><span class="line">  tzdata</span><br><span class="line">Suggested packages:</span><br><span class="line">  clickhouse-common-static-dbg</span><br><span class="line">The following NEW packages will be installed:</span><br><span class="line">  clickhouse-common-static tzdata</span><br><span class="line">0 upgraded, 2 newly installed, 0 to remove and 0 not upgraded.</span><br><span class="line">Need to get 117 MB of archives.</span><br><span class="line">After this operation, 397 MB of additional disk space will be used.</span><br><span class="line">Get:1 http://archive.ubuntu.com/ubuntu bionic-updates/main amd64 tzdata all 2019c-0ubuntu0.18.04 [190 kB]</span><br><span class="line">Get:2 http://repo.yandex.ru/clickhouse/deb/stable main/ clickhouse-common-static 20.3.4.10 [116 MB]</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 也可通过获取路径看到最新版的clickhouse-client等包为20.3.4.10，所以将Dockerfile中的version值改为20.3.4.*即可，或者在命令中不指定版本安装，默认打包最新的安装包即可。</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 其他docker build过程中的报错也可通过该方法解决，启动镜像找到报错原因去解决问题即可。</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 问题解决后，将已有镜像删除，重新进行打包</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 由于当时只启动了关于该镜像的容器，所以可以直接全部stop掉，如果有其他启动的容器，则不能这样关闭</span></span></span><br><span class="line">[root... test-clickhouse]# docker stop $(docker ps -a -q)</span><br><span class="line">8974a71311f5</span><br><span class="line">fae466f31ccf</span><br><span class="line">[root... test-clickhouse]# docker rm fae466f31ccf</span><br><span class="line">fae466f31ccf</span><br><span class="line">[root... test-clickhouse]# docker rm 8974a71311f5</span><br><span class="line">8974a71311f5</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 删除镜像</span></span></span><br><span class="line">[root... test-clickhouse]# docker rmi 9feb83a76f47</span><br><span class="line">Deleted: sha256:9feb83a76f4778aba0523c9e4bd492aa6804d1fa759558b8f93d8aa61ae6ac57</span><br><span class="line">Deleted: sha256:b99e0912ee05a0f2a581f061828a89b1b08d6485b5481bc3585e44a7c8f53857</span><br><span class="line">Deleted: sha256:227768fbfa5b173b32260e0cb38ef33d9495693593699c95b837f7b71a286064</span><br><span class="line">[root... test-clickhouse]# docker image ls        </span><br><span class="line">REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">ubuntu              18.04               4e5021d210f6        38 hours ago        64.2 MB</span><br><span class="line">hello-world         latest              fce289e99eb9        14 months ago       1.84 kB</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 重新打包</span></span></span><br><span class="line">[root... test-clickhouse]# docker build -t clickhouse-server-demo:1.0 .</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/03/21/clickhouse/clickhouse%E7%9A%84docker%E6%9E%B6%E6%9E%84/2.png" style="zoom:50%;">        
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 查看镜像</span></span></span><br><span class="line">[root... test-clickhouse]# docker image ls        </span><br><span class="line">REPOSITORY               TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">clickhouse-server-demo   1.0                 16acf3ee797d        21 minutes ago      492 MB</span><br><span class="line">ubuntu                   18.04               4e5021d210f6        3 days ago          64.2 MB</span><br><span class="line">hello-world              latest              fce289e99eb9        14 months ago       1.84 kB</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 启动容器</span></span></span><br><span class="line">[root... test-clickhouse]# docker run -d --name clickhouse-test-server --ulimit nofile=262144:262144  --volume=/work/clickhouse/clickhouse-test-server:/var/lib/clickhouse  clickhouse-server-demo:1.0</span><br><span class="line">958ed2deaab03542f2880f41e66346165252f953f91efa60b7d95ad6a1a88330</span><br><span class="line">[root... test-clickhouse]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                        COMMAND             CREATED             STATUS              PORTS                          NAMES</span><br><span class="line">958ed2deaab0        clickhouse-server-demo:1.0   "/entrypoint.sh"    3 seconds ago       Up 3 seconds        8123/tcp, 9000/tcp, 9009/tcp   clickhouse-test-server</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 进入容器</span></span></span><br><span class="line">[root... work]# docker exec -it 958e /bin/bash</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment">## 进入当前clickhouse</span></span></span><br><span class="line">root@958ed2deaab0:/# clickhouse-client </span><br><span class="line">ClickHouse client version 20.3.4.10 (official build).</span><br><span class="line">Connecting to localhost:9000 as user default.</span><br><span class="line">Connected to ClickHouse server version 20.3.4 revision 54433.</span><br><span class="line"></span><br><span class="line">958ed2deaab0 :) show databases;</span><br><span class="line"></span><br><span class="line">SHOW DATABASES</span><br><span class="line"></span><br><span class="line">┌─name────┐</span><br><span class="line">│ default │</span><br><span class="line">│ system  │</span><br><span class="line">└─────────┘</span><br><span class="line"></span><br><span class="line">2 rows in set. Elapsed: 0.002 sec.</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、client内容详解"><a href="#三、client内容详解" class="headerlink" title="三、client内容详解"></a>三、client内容详解</h2><p>​        client目录下仅有Dockerfile以及README.md文件</p>
+<h3 id="3-1、Dockerfile文件内容"><a href="#3-1、Dockerfile文件内容" class="headerlink" title="3.1、Dockerfile文件内容"></a>3.1、Dockerfile文件内容</h3><figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> ubuntu:<span class="number">18.04</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ARG</span> repository=<span class="string">"deb http://repo.yandex.ru/clickhouse/deb/stable/ main/"</span></span><br><span class="line"><span class="keyword">ARG</span> version=<span class="number">20.4</span>.<span class="number">1</span>.*</span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get install --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">        apt-transport-https \</span></span><br><span class="line"><span class="bash">        dirmngr \</span></span><br><span class="line"><span class="bash">        gnupg \</span></span><br><span class="line"><span class="bash">    &amp;&amp; mkdir -p /etc/apt/sources.list.d \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-key adv --keyserver keyserver.ubuntu.com --recv E0C56BD4 \</span></span><br><span class="line"><span class="bash">    &amp;&amp; <span class="built_in">echo</span> <span class="variable">$repository</span> &gt; /etc/apt/sources.list.d/clickhouse.list \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get update \</span></span><br><span class="line"><span class="bash">    &amp;&amp; env DEBIAN_FRONTEND=noninteractive \</span></span><br><span class="line"><span class="bash">        apt-get install --allow-unauthenticated --yes --no-install-recommends \</span></span><br><span class="line"><span class="bash">            clickhouse-client=<span class="variable">$version</span> \</span></span><br><span class="line"><span class="bash">            clickhouse-common-static=<span class="variable">$version</span> \</span></span><br><span class="line"><span class="bash">            locales \</span></span><br><span class="line"><span class="bash">            tzdata \</span></span><br><span class="line"><span class="bash">    &amp;&amp; rm -rf /var/lib/apt/lists/* /var/cache/debconf \</span></span><br><span class="line"><span class="bash">    &amp;&amp; apt-get clean</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">RUN</span><span class="bash"> locale-gen en_US.UTF-8</span></span><br><span class="line"><span class="keyword">ENV</span> LANG en_US.UTF-<span class="number">8</span></span><br><span class="line"><span class="keyword">ENV</span> LANGUAGE en_US:en</span><br><span class="line"><span class="keyword">ENV</span> LC_ALL en_US.UTF-<span class="number">8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="bash"> [<span class="string">"/usr/bin/clickhouse-client"</span>]</span></span><br></pre></td></tr></table></figure>
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

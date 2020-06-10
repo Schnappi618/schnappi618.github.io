@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        harbor配置外部数据库 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、搭建PostgreSQL数据库"><span class="toc-text">一、搭建PostgreSQL数据库</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-安装"><span class="toc-text">1. 安装</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-配置"><span class="toc-text">2. 配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-启动"><span class="toc-text">3. 启动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-登陆测试"><span class="toc-text">4. 登陆测试</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、Harbor配置"><span class="toc-text">二、Harbor配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-配置文件修改"><span class="toc-text">1. 配置文件修改</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-docker-compose文件修改"><span class="toc-text">2. docker-compose文件修改</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、测试验证"><span class="toc-text">三、测试验证</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-数据库验证"><span class="toc-text">1. 数据库验证</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-Web页面测试"><span class="toc-text">2. Web页面测试</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        harbor配置外部数据库
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-04-08 18:54:43</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#harbor" title="harbor">harbor</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#PostgreSQL" title="PostgreSQL">PostgreSQL</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​        harbor默认安装会使用官方打包的PostgreSQL docker镜像goharbor/harbor-db，harbor启动之后的数据均存放在改数据库上，后续管理可能存在不便，故使用harbor配置外部数据库。</p>
+<h2 id="一、搭建PostgreSQL数据库"><a href="#一、搭建PostgreSQL数据库" class="headerlink" title="一、搭建PostgreSQL数据库"></a>一、搭建PostgreSQL数据库</h2><p>​        harbor从1.6版本之后仅支持PostgreSQL数据库作为外部数据库，故需要搭建PostgreSQL数据库使用。这里目前作为测试，故仅安装了单节点，未配置主从，搭建步骤如下：</p>
+<h3 id="1-安装"><a href="#1-安装" class="headerlink" title="1. 安装"></a>1. 安装</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">- 系统版本：CentOS7</span><br><span class="line"></span><br><span class="line"><span class="comment">## 1. 安装依赖包</span></span><br><span class="line">yum install -y cmake gcc gcc-c++ perl readline readline-devel openssl openssl-devel zlib zlib-devel ncurses-devel readline readline-devel zlib zlib-devel</span><br><span class="line"></span><br><span class="line"><span class="comment">## 2. 源码安装PostgreSQL</span></span><br><span class="line">[postgres@xxxx dba]$ wget https://ftp.postgresql.org/pub/<span class="built_in">source</span>/v12.2/postgresql-12.2.tar.gz</span><br><span class="line">[postgres@xxxx dba]$ tar zxf postgresql-12.2.tar.gz </span><br><span class="line">[postgres@xxxx dba]$ <span class="built_in">cd</span> postgresql-12.2</span><br><span class="line">[postgres@xxxx postgresql-12.2]$ ./configure --prefix=/usr/<span class="built_in">local</span>/postgresql</span><br><span class="line">[postgres@xxxx postgresql-12.2]$ make &amp;&amp; make install</span><br><span class="line"><span class="comment">### 这里configure的时候制定了安装目录，故需要将该目录下的bin目录写入到环境变量中去，以方便后面直接使用，也可不指定，安装到默认路径下</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-配置"><a href="#2-配置" class="headerlink" title="2. 配置"></a>2. 配置</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 创建数据目录</span></span><br><span class="line">[postgres@xxxx data]$ mkdir -p /work/harbor-db/data</span><br><span class="line"><span class="comment"># 2. 创建日志目录</span></span><br><span class="line">[postgres@xxxx data]$ mkdir -p /work/harbor-db/<span class="built_in">log</span></span><br><span class="line"><span class="comment"># 3. 创建socket目录</span></span><br><span class="line">[postgres@xxxx data]$ mkdir -p /work/harbor-db/tmp</span><br><span class="line"><span class="comment"># 4. 授权</span></span><br><span class="line">[postgres@xxxx data]$ chown -R postgres.postgres /work/harbor-db/</span><br><span class="line"><span class="comment"># 5. 初始化pg实例</span></span><br><span class="line">[postgres@xxxx data]$ initdb --username=postgres -D /work/harbor-db/data/</span><br><span class="line"> </span><br><span class="line"><span class="comment">## 这里PostgreSQL数据库与harbor并未在同一台主机上，故除了修改配置文件postgresql.conf外还需要修改客户端认证配置pg_hba.conf文件，若在同一台主机上没有网络以及认证需求的话，可以不修改</span></span><br><span class="line"><span class="comment"># 6. 根据需要修改初始化的配置文件，修改位置如下：</span></span><br><span class="line">[postgres@xxxx data]$ vim /work/harbor-db/data/postgresql.conf</span><br><span class="line"> <span class="comment"># 数据目录指定</span></span><br><span class="line">data_directory = <span class="string">'/work/harbor-db/data'</span></span><br><span class="line"> <span class="comment"># 客户端可连接ip，默认为localhost，若不需要可不修改，*为所有</span></span><br><span class="line">listen_addresses = <span class="string">'*'</span></span><br><span class="line"> <span class="comment"># 端口设置</span></span><br><span class="line">port = 7002</span><br><span class="line"> <span class="comment"># 允许最大连接数</span></span><br><span class="line">max_connections = 100</span><br><span class="line"> <span class="comment"># socket目录及权限设置</span></span><br><span class="line">unix_socket_directories = <span class="string">'/work/harbor-db/tmp'</span></span><br><span class="line">unix_socket_group = <span class="string">''</span></span><br><span class="line">unix_socket_permissions = 0777</span><br><span class="line"> <span class="comment"># 内存大小</span></span><br><span class="line">shared_buffers = 128MB</span><br><span class="line"> <span class="comment"># 时区修改</span></span><br><span class="line">timezone = <span class="string">'Asia/Shanghai'</span></span><br><span class="line"> </span><br><span class="line"> <span class="comment"># 日志：</span></span><br><span class="line"> <span class="comment">## 是否开启日志</span></span><br><span class="line">logging_collector = on</span><br><span class="line"> <span class="comment">## 日志存放目录</span></span><br><span class="line">log_directory = <span class="string">'/work/harbor-db/log'</span></span><br><span class="line"> <span class="comment">## 每个日志最大size</span></span><br><span class="line">log_rotation_size = 1GB</span><br><span class="line"> <span class="comment">## 日志时区</span></span><br><span class="line">log_timezone = <span class="string">'Asia/Shanghai'</span></span><br><span class="line"> <span class="comment">## 记录执行时间大于100ms的sql及执行时间，相当于慢SQL日志</span></span><br><span class="line">log_min_duration_statement = 100</span><br><span class="line"></span><br><span class="line"><span class="comment">## 由于这里需要远程可以连接，所以需要添加认证配置pg_hba.conf，根据自己需求配置，若不需要的话可不配置该文件</span></span><br><span class="line">[postgres@xxxx data]$ vim pg_hba.conf </span><br><span class="line"><span class="comment"># 在文件末尾添加，以下配置表示，允许ADDRESS对应的主机，通过harbor用户访问该库的所有数据库</span></span><br><span class="line"><span class="comment"># TYPE  DATABASE        USER            ADDRESS                 METHOD</span></span><br><span class="line">host    all             harbor             x.x.x.x/x           trust</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-启动"><a href="#3-启动" class="headerlink" title="3. 启动"></a>3. 启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[postgres@xxxx data]$ su - postgres</span><br><span class="line"><span class="comment">## 启动方式使用以下1种即可</span></span><br><span class="line">[postgres@xxxx data]$ pg_ctl -D /work/harbor-db/data/ -l /work/harbor-db/<span class="built_in">log</span>/start.log start</span><br><span class="line"></span><br><span class="line">或使用 postgres -D /work/harbor-db/data &gt; /work/harbor-db/<span class="built_in">log</span>/start.log 2&gt;&amp;1 &amp; 命令启动</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-登陆测试"><a href="#4-登陆测试" class="headerlink" title="4. 登陆测试"></a>4. 登陆测试</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## 1. 本地测试</span></span><br><span class="line"><span class="comment"># 安装完成后会有postgres用户，相当于MySQL的root用户，默认没有密码</span></span><br><span class="line">[postgres@xxxx data]$ psql -h 127.0.0.1 -p 7002 -U postgres</span><br><span class="line">psql (12.2)</span><br><span class="line">Type <span class="string">"help"</span> <span class="keyword">for</span> <span class="built_in">help</span>.</span><br><span class="line"><span class="comment">### 修改postgres用户的密码</span></span><br><span class="line">postgres=<span class="comment"># \password postgres</span></span><br><span class="line">Enter new password: </span><br><span class="line">Enter it again: </span><br><span class="line"><span class="comment">### 创建harbor用户，并创建harbor所涉及数据库及进行授权</span></span><br><span class="line">postgres=<span class="comment"># create user harbor with password 'harbor123';</span></span><br><span class="line">CREATE ROLE</span><br><span class="line">postgres=<span class="comment"># CREATE DATABASE harbor;</span></span><br><span class="line">CREATE DATABASE</span><br><span class="line">postgres=<span class="comment"># create database harbor_clair;</span></span><br><span class="line">CREATE DATABASE</span><br><span class="line">postgres=<span class="comment"># create database harbor_notary_server;</span></span><br><span class="line">CREATE DATABASE</span><br><span class="line">postgres=<span class="comment"># create database harbor_notary_signer; </span></span><br><span class="line">CREATE DATABASE</span><br><span class="line">postgres=<span class="comment"># GRANT ALL PRIVILEGES ON DATABASE harbor to harbor;           </span></span><br><span class="line">GRANT</span><br><span class="line">postgres=<span class="comment"># GRANT ALL PRIVILEGES ON DATABASE harbor_clair to harbor;           </span></span><br><span class="line">GRANT</span><br><span class="line">postgres=<span class="comment"># GRANT ALL PRIVILEGES ON DATABASE harbor_notary_server to harbor;            </span></span><br><span class="line">GRANT</span><br><span class="line">postgres=<span class="comment"># GRANT ALL PRIVILEGES ON DATABASE harbor_notary_signer to harbor;                    </span></span><br><span class="line">GRANT</span><br><span class="line"></span><br><span class="line"><span class="comment">## 2. 远程主机harbor用户测试</span></span><br><span class="line">[root@remote harbor]<span class="comment"># psql -h x.x.x.x -p 7002 -U harbor -W </span></span><br><span class="line">Password: </span><br><span class="line">psql (12.2)</span><br><span class="line">Type <span class="string">"help"</span> <span class="keyword">for</span> <span class="built_in">help</span>.</span><br><span class="line"></span><br><span class="line">harbor=&gt;</span><br></pre></td></tr></table></figure>
+
+<p>​        至此，PostgreSQL数据库及基础配置设置完毕。</p>
+<h2 id="二、Harbor配置"><a href="#二、Harbor配置" class="headerlink" title="二、Harbor配置"></a>二、Harbor配置</h2><h3 id="1-配置文件修改"><a href="#1-配置文件修改" class="headerlink" title="1. 配置文件修改"></a>1. 配置文件修改</h3><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">[root@remote</span> <span class="string">harbor]#</span> <span class="string">vim</span> <span class="string">harbor.yml</span></span><br><span class="line"><span class="comment"># Uncomment external_database if using external database.</span></span><br><span class="line"><span class="attr">external_database:</span></span><br><span class="line">  <span class="attr">harbor:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">x.x.x.x</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">7002</span></span><br><span class="line">    <span class="attr">db_name:</span> <span class="string">harbor</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">harbor</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">xxxxxxxx</span></span><br><span class="line">    <span class="attr">ssl_mode:</span> <span class="string">disable</span></span><br><span class="line">    <span class="attr">max_idle_conns:</span> <span class="number">50</span></span><br><span class="line">    <span class="attr">max_open_conns:</span> <span class="number">100</span></span><br><span class="line">  <span class="attr">clair:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">x.x.x.x</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">7002</span></span><br><span class="line">    <span class="attr">db_name:</span> <span class="string">harbor_clair</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">harbor</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">xxxxxxxx</span></span><br><span class="line">    <span class="attr">ssl_mode:</span> <span class="string">disable</span></span><br><span class="line">  <span class="attr">notary_signer:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">x.x.x.x</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">7002</span></span><br><span class="line">    <span class="attr">db_name:</span> <span class="string">harbor_notary_signer</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">harbor</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">xxxxxxxx</span></span><br><span class="line">    <span class="attr">ssl_mode:</span> <span class="string">disable</span></span><br><span class="line">  <span class="attr">notary_server:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="string">x.x.x.x</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">7002</span></span><br><span class="line">    <span class="attr">db_name:</span> <span class="string">harbor_notary_server</span></span><br><span class="line">    <span class="attr">username:</span> <span class="string">harbor</span></span><br><span class="line">    <span class="attr">password:</span> <span class="string">xxxxxxxx</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-docker-compose文件修改"><a href="#2-docker-compose文件修改" class="headerlink" title="2. docker-compose文件修改"></a>2. docker-compose文件修改</h3><p>​        设置了外部数据库之后，便不再需要harbor本身的harbor-db镜像来支持，由安装重启文件<code>install.sh</code>可看出最终的安装等操作都由<code>docker-compose.yml</code>文件来完成，故需要在docker-compose文件中删除或注释掉harbor-db相关，修改完成后执行<code>sh install.sh</code>文件重启harbor服务即可。</p>
+<h2 id="三、测试验证"><a href="#三、测试验证" class="headerlink" title="三、测试验证"></a>三、测试验证</h2><h3 id="1-数据库验证"><a href="#1-数据库验证" class="headerlink" title="1. 数据库验证"></a>1. 数据库验证</h3><p>​        当harbor服务重启完成后，进入外部数据库中会发现刚才配置的库里面有了harbor的一些相关表。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">[root@remote harbor]<span class="comment"># psql -h x.x.x.x -p 7002 -U harbor -W </span></span><br><span class="line">Password: </span><br><span class="line">psql (12.2)</span><br><span class="line">Type <span class="string">"help"</span> <span class="keyword">for</span> <span class="built_in">help</span>.</span><br><span class="line"><span class="comment"># 查看有哪些库</span></span><br><span class="line">harbor=&gt; \l</span><br><span class="line">                                       List of databases</span><br><span class="line">         Name         |  Owner   | Encoding |   Collate   |    Ctype    |   Access privileges   </span><br><span class="line">----------------------+----------+----------+-------------+-------------+-----------------------</span><br><span class="line"> harbor               | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =Tc/postgres         +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres+</span><br><span class="line">                      |          |          |             |             | harbor=CTc/postgres</span><br><span class="line"> harbor_clair         | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =Tc/postgres         +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres+</span><br><span class="line">                      |          |          |             |             | harbor=CTc/postgres</span><br><span class="line"> harbor_notary_server | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =Tc/postgres         +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres+</span><br><span class="line">                      |          |          |             |             | harbor=CTc/postgres</span><br><span class="line"> harbor_notary_signer | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =Tc/postgres         +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres+</span><br><span class="line">                      |          |          |             |             | harbor=CTc/postgres</span><br><span class="line"> postgres             | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | </span><br><span class="line"> template0            | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres</span><br><span class="line"> template1            | postgres | UTF8     | en_US.UTF-8 | en_US.UTF-8 | =c/postgres          +</span><br><span class="line">                      |          |          |             |             | postgres=CTc/postgres</span><br><span class="line">(7 rows)</span><br><span class="line"><span class="comment"># 进入harbor库中</span></span><br><span class="line">harbor=&gt; \c harbor</span><br><span class="line">Password <span class="keyword">for</span> user harbor: </span><br><span class="line">You are now connected to database <span class="string">"harbor"</span> as user <span class="string">"harbor"</span>.</span><br><span class="line"><span class="comment"># 查看该库有哪些表</span></span><br><span class="line">harbor=&gt; \dt</span><br><span class="line">                 List of relations</span><br><span class="line"> Schema |           Name           | Type  | Owner  </span><br><span class="line">--------+--------------------------+-------+--------</span><br><span class="line"> public | access                   | table | harbor</span><br><span class="line"> public | access_log               | table | harbor</span><br><span class="line"> public | admin_job                | table | harbor</span><br><span class="line"> public | alembic_version          | table | harbor</span><br><span class="line"> public | artifact                 | table | harbor</span><br><span class="line"> public | artifact_blob            | table | harbor</span><br><span class="line"> public | blob                     | table | harbor</span><br><span class="line"> public | cve_whitelist            | table | harbor</span><br><span class="line"> public | harbor_label             | table | harbor</span><br><span class="line"> public | harbor_resource_label    | table | harbor</span><br><span class="line"> public | harbor_user              | table | harbor</span><br><span class="line"> public | immutable_tag_rule       | table | harbor</span><br><span class="line"> public | job_log                  | table | harbor</span><br><span class="line"> public | notification_job         | table | harbor</span><br><span class="line"> public | notification_policy      | table | harbor</span><br><span class="line"> public | oidc_user                | table | harbor</span><br><span class="line"> public | project                  | table | harbor</span><br><span class="line"> public | project_blob             | table | harbor</span><br><span class="line"> public | project_member           | table | harbor</span><br><span class="line"> public | project_metadata         | table | harbor</span><br><span class="line"> public | properties               | table | harbor</span><br><span class="line"> public | quota                    | table | harbor</span><br><span class="line"> public | quota_usage              | table | harbor</span><br><span class="line"> public | registry                 | table | harbor</span><br><span class="line"> public | replication_execution    | table | harbor</span><br><span class="line"> public | replication_policy       | table | harbor</span><br><span class="line"> public | replication_schedule_job | table | harbor</span><br><span class="line"> public | replication_task         | table | harbor</span><br><span class="line"> public | repository               | table | harbor</span><br><span class="line"> public | retention_execution      | table | harbor</span><br><span class="line"> public | retention_policy         | table | harbor</span><br><span class="line"> public | retention_task           | table | harbor</span><br><span class="line"> public | robot                    | table | harbor</span><br><span class="line"> public | role                     | table | harbor</span><br><span class="line"> public | scan_report              | table | harbor</span><br><span class="line"> public | scanner_registration     | table | harbor</span><br><span class="line"> public | schedule                 | table | harbor</span><br><span class="line"> public | schema_migrations        | table | harbor</span><br><span class="line"> public | user_group               | table | harbor</span><br><span class="line">(39 rows)</span><br><span class="line"></span><br><span class="line"><span class="comment">## 由于并没有开启其他三个组件的功能，所以其他三个库里面没有表，当harbor库中有表存在后，则外部数据库配置成功</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-Web页面测试"><a href="#2-Web页面测试" class="headerlink" title="2. Web页面测试"></a>2. Web页面测试</h3><p>​        根据之前的<a href="[https://schnappi618.github.io/2020/03/28/harbor%E6%90%AD%E5%BB%BAdocker%E7%A7%81%E6%9C%89%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93/](https://schnappi618.github.io/2020/03/28/harbor搭建docker私有镜像仓库/)">harbor搭建</a>中最后的web页面创建镜像仓库的演示，可新创建一个镜像仓库，并上传一个镜像，完成后，在数据库中可看到记录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">harbor_notary_signer=&gt; \c harbor</span><br><span class="line">Password <span class="keyword">for</span> user harbor: </span><br><span class="line">You are now connected to database <span class="string">"harbor"</span> as user <span class="string">"harbor"</span>.</span><br><span class="line"><span class="comment"># 查看操作日志，创建了一个pingcap仓库，并上传了一个tikv:v3.0.12的镜像到pingcap仓库中，所有的操作均为admin用户执行</span></span><br><span class="line">harbor=&gt; select * from access_log;</span><br><span class="line"> log_id | username | project_id |  repo_name   | repo_tag | guid | operation |          op_time           </span><br><span class="line">--------+----------+------------+--------------+----------+------+-----------+----------------------------</span><br><span class="line">      1 | admin    |          2 | pingcap/     | N/A      |      | create    | 2020-04-08 18:02:50.369493</span><br><span class="line">      2 | admin    |          2 | pingcap/tikv | v3.0.12  |      | push      | 2020-04-08 18:03:48.824079</span><br><span class="line">(2 rows)</span><br><span class="line"><span class="comment"># 查看目前有哪些仓库，即project</span></span><br><span class="line">harbor=&gt; select * from project;   </span><br><span class="line"> project_id | owner_id |  name   |       creation_time        |        update_time         | deleted </span><br><span class="line">------------+----------+---------+----------------------------+----------------------------+---------</span><br><span class="line">          1 |        1 | library | 2020-04-08 17:48:10.024358 | 2020-04-08 17:48:10.024358 | f</span><br><span class="line">          2 |        1 | pingcap | 2020-04-08 18:02:50        | 2020-04-08 18:02:50        | f</span><br><span class="line">(2 rows)</span><br><span class="line"><span class="comment"># 查看目前有哪些镜像</span></span><br><span class="line">harbor=&gt; select * from repository;</span><br><span class="line"> repository_id |     name     | project_id | description | pull_count | star_count |       creation_time        |        update_t</span><br><span class="line">ime         </span><br><span class="line">---------------+--------------+------------+-------------+------------+------------+----------------------------+----------------</span><br><span class="line">------------</span><br><span class="line">             1 | pingcap/tikv |          2 |             |          0 |          0 | 2020-04-08 18:03:48.824717 | 2020-04-08 18:0</span><br><span class="line">3:48.824717</span><br><span class="line">(1 row)</span><br></pre></td></tr></table></figure>
+
+<p>​        可以看到，所有的结果均符合预期，harbor配置外部数据库及测试完成。^_^</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

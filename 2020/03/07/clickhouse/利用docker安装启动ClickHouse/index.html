@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        利用docker安装启动ClickHouse - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、clickhouse简介"><span class="toc-text">一、clickhouse简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、安装启动"><span class="toc-text">二、安装启动</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、Debian-Ubuntu-RPM安装ClickHouse"><span class="toc-text">1、Debian&#x2F;Ubuntu&#x2F;RPM安装ClickHouse</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、docker安装ClickHouse"><span class="toc-text">2、docker安装ClickHouse</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-docker安装"><span class="toc-text">2.1 docker安装</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-安装ClickHouse"><span class="toc-text">2.2 安装ClickHouse</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-启动并连接clickhouse-server"><span class="toc-text">2.3 启动并连接clickhouse-server</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、客户端常用参数"><span class="toc-text">3、客户端常用参数</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        利用docker安装启动ClickHouse
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-03-07 18:41:16</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h2 id="一、clickhouse简介"><a href="#一、clickhouse简介" class="headerlink" title="一、clickhouse简介"></a>一、clickhouse简介</h2><p>​        ClickHouse是一个面向列存储的数据库管理系统，可以使用SQL查询实时生成分析数据报告，主要用于OLAP(在线分析处理查询)场景。关于clickhouse原理以及基础知识在以后学习中慢慢总结。(^_^)</p>
+<h2 id="二、安装启动"><a href="#二、安装启动" class="headerlink" title="二、安装启动"></a>二、安装启动</h2><p>这里主要描述如何使用docker安装并启动clickhouse，其他安装方法均参考了官方文档: <a href="https://clickhouse.tech/docs/zh/getting_started/install/" target="_blank" rel="noopener">https://clickhouse.tech/docs/zh/getting_started/install/</a></p>
+<h3 id="1、Debian-Ubuntu-RPM安装ClickHouse"><a href="#1、Debian-Ubuntu-RPM安装ClickHouse" class="headerlink" title="1、Debian/Ubuntu/RPM安装ClickHouse"></a>1、Debian/Ubuntu/RPM安装ClickHouse</h3><p>对于以上方法安装，官方均提供了安装包，直接通过<code>apt-get install</code>或<code>rpm -ivh</code>安装即可，安装包路径如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Debian/Ubuntu</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 安装包位置：https://repo.yandex.ru/clickhouse/deb/stable/main/</span></span></span><br><span class="line">deb http://repo.yandex.ru/clickhouse/deb/stable/ main/</span><br><span class="line">sudo apt-get install dirmngr    # optional</span><br><span class="line">sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv E0C56BD4    # optional</span><br><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install clickhouse-client clickhouse-server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> rpm安装</span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 安装包位置：https://repo.yandex.ru/clickhouse/rpm/stable/x86_64</span></span></span><br><span class="line">sudo yum install yum-utils</span><br><span class="line">sudo rpm --import https://repo.yandex.ru/clickhouse/CLICKHOUSE-KEY.GPG</span><br><span class="line">sudo yum-config-manager --add-repo https://repo.yandex.ru/clickhouse/rpm/stable/x86_64</span><br><span class="line">sudo yum install clickhouse-server clickhouse-client</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、docker安装ClickHouse"><a href="#2、docker安装ClickHouse" class="headerlink" title="2、docker安装ClickHouse"></a>2、docker安装ClickHouse</h3><h4 id="2-1-docker安装"><a href="#2-1-docker安装" class="headerlink" title="2.1 docker安装"></a>2.1 docker安装</h4><p>Centos安装docker参考于docker官方文档：<a href="https://docs.docker.com/install/linux/docker-ce/centos/" target="_blank" rel="noopener">https://docs.docker.com/install/linux/docker-ce/centos/</a></p>
+<p>2.1.1、卸载老版本docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine</span><br></pre></td></tr></table></figure>
+
+<p>2.1.2、安装依赖包并设置官方镜像源</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum install -y yum-utils device-mapper-persistent-data lvm2</span><br><span class="line">yum-config-manager --add-repo https:&#x2F;&#x2F;download.docker.com&#x2F;linux&#x2F;centos&#x2F;docker-ce.repo</span><br></pre></td></tr></table></figure>
+
+<p>2.1.3、安装最新版docker</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
+
+<p>2.1.4、启动docker</p>
+<p>目前docker最新版本为19.03版本，安装该版本启动时(安装17.03版本并没有报错)有可能产生以下报错：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> systemctl start docker</span></span><br><span class="line">A dependency job for docker.service failed. See 'journalctl -xe' for details.</span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 报错具体如下图：出现该报错的原因是，由于主机之前对/etc/group等文件进行过`chattr +i`加锁操作，导致docker安装时执行groupadd docker报错</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"><span class="comment"># 解决方法，对相关文件解锁之后，执行groupadd docker即可</span></span></span><br><span class="line">此时执行systemctl start docker即可成功启动</span><br><span class="line"></span><br><span class="line">启动完成后可利用官方提供的hello-world进行测试</span><br><span class="line">docker run hello-world</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/03/07/clickhouse/%E5%88%A9%E7%94%A8docker%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8ClickHouse/1.jpg" style="zoom:50%;">
+
+<h4 id="2-2-安装ClickHouse"><a href="#2-2-安装ClickHouse" class="headerlink" title="2.2 安装ClickHouse"></a>2.2 安装ClickHouse</h4><p>​        docker环境搭建好之后，利用docker安装clickhouse比较简单，clickhouse官方提供了默认的镜像，直接使用即可。官方文档参考：<a href="https://hub.docker.com/r/yandex/clickhouse-server/" target="_blank" rel="noopener">https://hub.docker.com/r/yandex/clickhouse-server/</a></p>
+<p>​        目前正在研究如何根据源码包修改docker文件，安装之后得到想要的配置，预计下周出个文章详解^_^</p>
+<p>2.2.1、拉取clickhouse的docker镜像</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull yandex/clickhouse-server</span><br><span class="line">docker pull yandex/clickhouse-clinet</span><br></pre></td></tr></table></figure>
+
+<p>2.2.2、启动server端</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 默认直接启动即可</span></span><br><span class="line">docker run -d --name [启动之后的名称] --ulimit nofile=262144:262144 yandex/clickhouse-server</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果想指定目录启动，这里以clickhouse-test-server命令为例，可以随意写</span></span><br><span class="line">mkdir /work/clickhouse/clickhouse-test-db       ## 创建数据文件目录</span><br><span class="line"><span class="meta">#</span><span class="bash"> 使用以下路径启动，在外只能访问clickhouse提供的默认9000端口，只能通过clickhouse-client连接server</span></span><br><span class="line">docker run -d --name clickhouse-test-server --ulimit nofile=262144:262144 --volume=/work/clickhouse/clickhouse_test_db:/var/lib/clickhouse yandex/clickhouse-server</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-启动并连接clickhouse-server"><a href="#2-3-启动并连接clickhouse-server" class="headerlink" title="2.3 启动并连接clickhouse-server"></a>2.3 启动并连接clickhouse-server</h4><p>2.3.1、docker启动clickhouse-client</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -it --rm --link clickhouse-test-server:clickhouse-server yandex/clickhouse-client --host clickhouse-server</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/03/07/clickhouse/%E5%88%A9%E7%94%A8docker%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8ClickHouse/2.png" style="zoom:50%;">
+
+<p>2.3.2、使用clickhouse-client连接</p>
+<img src="/2020/03/07/clickhouse/%E5%88%A9%E7%94%A8docker%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8ClickHouse/3.png" style="zoom:50%;">
+
+<h3 id="3、客户端常用参数"><a href="#3、客户端常用参数" class="headerlink" title="3、客户端常用参数"></a>3、客户端常用参数</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">clickhouse-client</span><br><span class="line">    --host, -h     	：服务端host名称，默认 localhost</span><br><span class="line">    --port         	：连接端口，默认9000</span><br><span class="line">    --user, -u     	：用户名，默认 default</span><br><span class="line">    --password     	：密码，默认空</span><br><span class="line">    --query, -q    	：非交互模式下的查询语句</span><br><span class="line">    --database, -d 	：默认当前操作的数据库，默认default</span><br><span class="line">    --multiline, -m ：允许多行语句查询，在clickhouse中默认回车即为sql结束，可使用该参数多行输入</span><br><span class="line">    --format, -f		：使用指定的默认格式输出结果      csv,以逗号分隔</span><br><span class="line">    --time, -t			：非交互模式下会打印查询执行的时间</span><br><span class="line">    --stacktrace		：出现异常会打印堆栈跟踪信息</span><br><span class="line">    --config-file		：配置文件名称</span><br></pre></td></tr></table></figure>
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>
