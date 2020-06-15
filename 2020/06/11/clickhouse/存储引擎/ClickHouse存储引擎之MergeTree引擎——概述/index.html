@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        ClickHouse存储引擎之MergeTree引擎——概述 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、MergeTree系列引擎概述"><span class="toc-text">一、MergeTree系列引擎概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、MergeTree-合并树-引擎"><span class="toc-text">二、MergeTree(合并树)引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、创建方式"><span class="toc-text">1、创建方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、配置参数介绍"><span class="toc-text">2、配置参数介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、MergeTree存储结构"><span class="toc-text">三、MergeTree存储结构</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        ClickHouse存储引擎之MergeTree引擎——概述
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-06-11 15:55:35</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#engine" title="engine">engine</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#MergeTree" title="MergeTree">MergeTree</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h2 id="一、MergeTree系列引擎概述"><a href="#一、MergeTree系列引擎概述" class="headerlink" title="一、MergeTree系列引擎概述"></a>一、MergeTree系列引擎概述</h2><p>​    在ClickHouse中，存储引擎决定了一张表拥有哪些特性以及读写数据的方式等。在所有的存储引擎中，MergeTree及其*MergeTree系列是最强大的表引擎，它适用于一些高负载任务，可以快速插入数据并在后台进行数据处理，还支持了主键索引、分区、数据复制等一些其他引擎不支持的功能。</p>
+<p>​    该类型的引擎包括：</p>
+<ul>
+<li><p>MergeTree</p>
+</li>
+<li><p>Replacing MergeTree</p>
+</li>
+<li><p>Summing MergeTree</p>
+</li>
+<li><p>Aggregating MergeTree</p>
+</li>
+<li><p>Collapsing MergeTree</p>
+</li>
+<li><p>Versioned Collapsing MergeTree</p>
+</li>
+<li><p>Graphite MergeTree</p>
+<p>其中，MergeTree引擎具备了这一系列引擎的基本特征，是<em>MergeTree系列引擎的基础，需要注意的是**</em>MergeTree引擎并不属于<em>MergeTree系列*</em></p>
+</li>
+</ul>
+<h2 id="二、MergeTree-合并树-引擎"><a href="#二、MergeTree-合并树-引擎" class="headerlink" title="二、MergeTree(合并树)引擎"></a>二、MergeTree(合并树)引擎</h2><p>​    MergeTree插入的数据会直接写入文件系统，故它仅适用于批量插入数据，而不适合频繁插入单行数据的情况，MergeTree在写入一批数据时，数据会以不可修改的数据片段形式写入到磁盘中，同时为了避免数据片段过多，ClickHouse会通过后台线程，定期合并数据片段，属于相同分区的数据片段会被合并为一个新的片段。</p>
+<h3 id="1、创建方式"><a href="#1、创建方式" class="headerlink" title="1、创建方式"></a>1、创建方式</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- MergeTree引擎表的创建格式为</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> [<span class="keyword">IF</span> <span class="keyword">NOT</span> <span class="keyword">EXISTS</span>] [db.]table_name [<span class="keyword">ON</span> CLUSTER cluster]</span><br><span class="line">(</span><br><span class="line">    name1 [type1] [<span class="keyword">DEFAULT</span>|<span class="keyword">MATERIALIZED</span>|<span class="keyword">ALIAS</span> expr1] [TTL expr1],</span><br><span class="line">    name2 [type2] [<span class="keyword">DEFAULT</span>|<span class="keyword">MATERIALIZED</span>|<span class="keyword">ALIAS</span> expr2] [TTL expr2],</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">INDEX</span> index_name1 expr1 <span class="keyword">TYPE</span> type1(...) GRANULARITY value1,</span><br><span class="line">    <span class="keyword">INDEX</span> index_name2 expr2 <span class="keyword">TYPE</span> type2(...) GRANULARITY value2</span><br><span class="line">) <span class="keyword">ENGINE</span> = MergeTree()</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> expr</span><br><span class="line">[<span class="keyword">PARTITION</span> <span class="keyword">BY</span> expr]</span><br><span class="line">[PRIMARY <span class="keyword">KEY</span> expr]</span><br><span class="line">[<span class="keyword">SAMPLE</span> <span class="keyword">BY</span> expr]</span><br><span class="line">[TTL expr [<span class="keyword">DELETE</span>|<span class="keyword">TO</span> DISK <span class="string">'xxx'</span>|<span class="keyword">TO</span> VOLUME <span class="string">'xxx'</span>], ...]</span><br><span class="line">[<span class="keyword">SETTINGS</span> <span class="keyword">name</span>=<span class="keyword">value</span>, ...]</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2、配置参数介绍"><a href="#2、配置参数介绍" class="headerlink" title="2、配置参数介绍"></a>2、配置参数介绍</h3><ol>
+<li>必填项：</li>
+</ol>
+<ul>
+<li><code>ENGINE</code>：指定使用的引擎。</li>
+<li><code>ORDER BY</code>：排序键，用于指定在一个数据片段内，使用的排序方式。<ul>
+<li>当未指定排序键时，默认会使用主键排序，同样的，当未指定主键时，默认会使用排序键作为主键</li>
+<li>可以是单列名称或多列字段的元组格式。例如：<code>ORDER BY (CounterId)</code>或``ORDER BY (CounterID, EventDate)`</li>
+<li>当使用多列字段排序，例如<code>ORDER BY (CounterID, EventDate)</code>，在单个数据片段内，会先根据CounterID字段排序，CounterID相同的数据再按照EventDate排序</li>
+</ul>
+</li>
+</ul>
+<ol start="2">
+<li>可选项：</li>
+</ol>
+<ul>
+<li><code>PARITION BY</code>：分区键</li>
+<li><code>PRIMARY KEY</code>：主键，指定后会按照主键字段生成一级索引，用于加速表查询。默认情况下与<code>ORDER BY</code>子句相同，否则的话主键表达式必须为排序表达式元组的前缀。主键声明后，单个数据片段内会按照主键字段升序排序。<strong>MergeTree主键允许数据重复。</strong></li>
+<li><code>SAMPLE BY</code>：抽样表达式。若指定了该选项，则主键也必须包含它。例如：<code>...ENGINE = MergeTree() ORDER BY (CounterID, EventDate, intHash32(UserID)) SAMPLE BY intHash32(UserID)</code></li>
+<li><code>TTL</code>：数据生存期，用于指定数据的存储时间。<ul>
+<li>表达式中必须包含一个<code>Date</code>或<code>DateTime</code>类型的列，例如：<code>TTL date + INTERVAL 1 DAY</code>，默认当表中数据达到这个时间时，会删除对应的数据信息</li>
+<li>也可对满足该表达式的数据进行对应操作，例如：<code>TTL date + INTERVAL 1 MONTH DELETE|TO DISK &#39;xxx&#39;</code>，对满足表达式的数据，表中删除过期的行并移动到指定的磁盘上</li>
+<li>可以指定多个规则的操作，但只能有一个<code>DELETE</code>操作</li>
+</ul>
+</li>
+<li><code>SETTING</code>：控制MergeTree的其他可选参数<ul>
+<li><code>index_granularity</code>：索引粒度，默认值为8192。表示在默认情况下，clickhouse每间隔8192条数据生成一条索引</li>
+<li><code>index_granularity_bytes</code>：索引粒度，早期版本只允许<code>index_granularity</code>参数按照间隔数据条数设置索引粒度，后续版本支持该参数设置数据量大小限制索引粒度，默认值为10M，设置为0表示不启动根据数据量自适应功能</li>
+<li><code>enable_mixed_granularity_parts</code>：表示是否开启自适应限制索引粒度的功能，默认开启</li>
+<li><code>merge_with_ttl_timeout</code>：TTL合并频率的最小时间间隔，默认值为86400(1天)</li>
+<li><code>use_minimalistic_part_header_in_zookeeper</code>：设置数据片段头部在zookeeper中的存储方式</li>
+<li><code>min_merge_bytes_to_use_direct_io</code>：当数据量大于这个值时，使用直接I/O来读取数据并进行合并操作，默认值为10G，设置为0时表示禁用直接I/O</li>
+<li><code>storage_policy</code>：设置存储策略</li>
+</ul>
+</li>
+</ul>
+<h2 id="三、MergeTree存储结构"><a href="#三、MergeTree存储结构" class="headerlink" title="三、MergeTree存储结构"></a>三、MergeTree存储结构</h2><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试数据库</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test.partitioned_by_week(d <span class="built_in">Date</span>, x UInt8) <span class="keyword">ENGINE</span> = MergeTree <span class="keyword">PARTITION</span> <span class="keyword">BY</span> toMonday(d) <span class="keyword">ORDER</span> <span class="keyword">BY</span> x;</span><br><span class="line"></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> test.partitioned_by_week</span><br><span class="line">(</span><br><span class="line">    <span class="string">`d`</span> <span class="built_in">Date</span>, </span><br><span class="line">    <span class="string">`x`</span> UInt8</span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = MergeTree</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> toMonday(d)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> x</span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入两条测试数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">INSERT</span> <span class="keyword">INTO</span> test.partitioned_by_week <span class="keyword">VALUES</span> (<span class="string">'2000-01-01'</span>, <span class="number">1</span>), (<span class="string">'2000-01-02'</span>, <span class="number">2</span>), (<span class="string">'2000-01-03'</span>, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> test.partitioned_by_week <span class="keyword">VALUES</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">3</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.070</span> sec. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- test库下的表</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">show</span> <span class="keyword">tables</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SHOW</span> <span class="keyword">TABLES</span></span><br><span class="line"></span><br><span class="line">┌─<span class="keyword">name</span>────────────────┐</span><br><span class="line">│ partitioned_by_week │</span><br><span class="line">└─────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.007</span> sec.</span><br></pre></td></tr></table></figure>
+
+<p>​    执行上述操作后，查看clickhouse中test库下的数据目录如下：</p>
+<img src="/2020/06/11/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%A6%82%E8%BF%B0/mergetree1.png" style="zoom:45%;">
+
+<p>​    可以看出，一张表完整的物理结构由表目录、分区目录、数据文件作为层级组成，他们各自的作用如下：</p>
+<ul>
+<li><p>partition：分区目录</p>
+<ul>
+<li>测试数据中分区目录为<code>19991227_1_1_0</code>和<code>20000103_2_2_0</code>，属于相同分区的数据，会被合并到同一个分区目录中</li>
+</ul>
+</li>
+<li><p>checksums.txt：校验文件</p>
+<ul>
+<li>按二进制格式存储，保存了剩余数据文件的大小及其哈希值，用于快速校验数据文件的完整性和准确性</li>
+</ul>
+</li>
+<li><p>columns.txt：列信息文件</p>
+<ul>
+<li>使用明文存储，用于保存该分区目录下的列字段信息。例如：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxx <span class="built_in">test</span>]<span class="comment"># cat partitioned_by_week/19991227_1_1_0/columns.txt </span></span><br><span class="line">columns format version: 1</span><br><span class="line">2 columns:</span><br><span class="line">`d` Date</span><br><span class="line">`x` UInt8</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>count.txt：计数文件</p>
+<ul>
+<li>使用明文存储，记录保存了当前数据分区目录下的数据行数。例如：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxx <span class="built_in">test</span>]<span class="comment"># cat partitioned_by_week/19991227_1_1_0/count.txt </span></span><br><span class="line">2</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>primary.idx：一级索引文件</p>
+<ul>
+<li>使用二进制格式存储。用于存放稀疏索引，一张MergeTree通过ORDER BY或PRIMARY KEY只能声明一个一级索引</li>
+</ul>
+</li>
+<li><p>[column].bin：数据文件</p>
+<ul>
+<li>默认使用LZ4压缩格式存储。用来存放该数据分区的某列的数据。MergeTree采用了列式存储，故每列字段都有独立的bin数据文件，以列名命名。</li>
+</ul>
+</li>
+<li><p>[column].mrk或[column].mrk2：列字段标记文件</p>
+<ul>
+<li>使用二进制格式存储。保存了[column].bin文件的偏移量信息，MergeTree通过该文件建立了primary.idx稀疏索引与[column].bin文件之间的映射关系。它会先通过primary.idx找到对应数据的偏移量信息column.mrk，再通过偏移量直接从[column].bin文件中读取数据。该文件与[column].bin文件一一对应，也是每列字段都有独立的mrk文件，如果使用了自适应大小的索引间隔，会以.mrk2命名</li>
+</ul>
+</li>
+<li><p>partition.dat和minmax_d.idx：分区索引文件</p>
+<ul>
+<li>当使用了分区键，例如<code>PARTITION BY toMonday(d)</code>，便会生成partition.dat和minmax_d.idx索引文件，均适用二进制格式存储。</li>
+<li>partition.dat用于保存当前分区下，分区表达式最终生成的值</li>
+<li>minmax_d.idx用于记录当前分区下，分区字段对应原始数据的最小和最大值</li>
+</ul>
+</li>
+</ul>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>
