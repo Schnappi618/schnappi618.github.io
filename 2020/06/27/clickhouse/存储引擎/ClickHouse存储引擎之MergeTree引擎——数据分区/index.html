@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        ClickHouse存储引擎之MergeTree引擎——数据分区 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、MergeTree数据分区规则"><span class="toc-text">一、MergeTree数据分区规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、测试示例"><span class="toc-text">1、测试示例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、MergeTree数据分区规则"><span class="toc-text">2、MergeTree数据分区规则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、MergeTree数据分区合并规则"><span class="toc-text">二、MergeTree数据分区合并规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、合并分区后的命名规则"><span class="toc-text">1、合并分区后的命名规则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、示例"><span class="toc-text">2、示例</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        ClickHouse存储引擎之MergeTree引擎——数据分区
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-06-27 10:09:11</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#engine" title="engine">engine</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#MergeTree" title="MergeTree">MergeTree</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​    从<a href="[https://schnappi618.github.io/2020/06/11/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%A6%82%E8%BF%B0/](https://schnappi618.github.io/2020/06/11/clickhouse/存储引擎/ClickHouse存储引擎之MergeTree引擎——概述/)">ClickHouse存储引擎之MergeTree引擎——概述</a>中可以知道，在MergeTree存储引擎中，数据是以分区目录的形式存放的。基于该原理，在进行数据查询时，可以仅查询最小的分区目录。</p>
+<h2 id="一、MergeTree数据分区规则"><a href="#一、MergeTree数据分区规则" class="headerlink" title="一、MergeTree数据分区规则"></a>一、MergeTree数据分区规则</h2><h3 id="1、测试示例"><a href="#1、测试示例" class="headerlink" title="1、测试示例"></a>1、测试示例</h3><p>​    下面仍然使用上一篇的测试数据来继续说明MergeTree的数据分区方式和规则</p>
+<ol>
+<li>原始数据情况</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 初始化数据后的数据目录如下</span></span><br><span class="line">[root@xxxx partitioned_by_week]<span class="comment"># ll</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 19991227_1_1_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 20000103_2_2_0</span><br><span class="line">drwxr-x--- 2 101 101  10 Jun 13 17:15 detached</span><br><span class="line">-rw-r----- 1 101 101   1 Jun 13 17:15 format_version.txt</span><br><span class="line"></span><br><span class="line"><span class="comment"># 目前partitioned_by_week表的数据内容为</span></span><br><span class="line"><span class="comment">## 查询该表的测试数据</span></span><br><span class="line">clickhouse-server_1 :) select * from partitioned_by_week;</span><br><span class="line"></span><br><span class="line">SELECT *</span><br><span class="line">FROM partitioned_by_week</span><br><span class="line"></span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ 2000-01-03 │ 3 │</span><br><span class="line">└────────────┴───┘</span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ 2000-01-01 │ 1 │</span><br><span class="line">│ 2000-01-02 │ 2 │</span><br><span class="line">└────────────┴───┘</span><br><span class="line"></span><br><span class="line">3 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.004 sec. </span><br><span class="line"><span class="comment">## 表结构如下</span></span><br><span class="line">clickhouse-server_1 :) show create table partitioned_by_week;</span><br><span class="line"></span><br><span class="line">SHOW CREATE TABLE partitioned_by_week</span><br><span class="line"></span><br><span class="line">┌─statement────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐</span><br><span class="line">│ CREATE TABLE test.partitioned_by_week (`d` Date, `x` UInt8) ENGINE = MergeTree PARTITION BY toMonday(d) ORDER BY x SETTINGS index_granularity = 8192 │</span><br><span class="line">└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line">1 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.003 sec.</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>插入一条新的数据</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 插入一条新的数据('2000-01-05', 4)</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">insert</span> <span class="keyword">into</span> partitioned_by_week (d, x) <span class="keyword">values</span>(<span class="string">'2000-01-05'</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> partitioned_by_week (d, x) <span class="keyword">VALUES</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.004</span> sec.</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>数据内容及数据目录如下</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询数据情况</span></span><br><span class="line">clickhouse-server_1 :) select * from partitioned_by_week</span><br><span class="line"></span><br><span class="line">SELECT *</span><br><span class="line">FROM partitioned_by_week</span><br><span class="line"></span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ 2000-01-03 │ 3 │</span><br><span class="line">└────────────┴───┘</span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ 2000-01-01 │ 1 │</span><br><span class="line">│ 2000-01-02 │ 2 │</span><br><span class="line">└────────────┴───┘</span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ 2000-01-05 │ 4 │</span><br><span class="line">└────────────┴───┘</span><br><span class="line"></span><br><span class="line">4 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.009 sec.</span><br><span class="line"><span class="comment"># 查询数据分区情况，active = 1表示启用中</span></span><br><span class="line">clickhouse-server_1 :) SELECT partition,name,active FROM system.parts WHERE table = <span class="string">'partitioned_by_week'</span></span><br><span class="line"></span><br><span class="line">SELECT </span><br><span class="line">    partition, </span><br><span class="line">    name, </span><br><span class="line">    active</span><br><span class="line">FROM system.parts</span><br><span class="line">WHERE table = <span class="string">'partitioned_by_week'</span></span><br><span class="line"></span><br><span class="line">┌─partition──┬─name───────────┬─active─┐</span><br><span class="line">│ 1999-12-27 │ 19991227_1_1_0 │      1 │</span><br><span class="line">│ 2000-01-03 │ 20000103_2_2_0 │      1 │</span><br><span class="line">│ 2000-01-03 │ 20000103_3_3_0 │      1 │</span><br><span class="line">└────────────┴────────────────┴────────┘</span><br><span class="line"></span><br><span class="line">3 rows <span class="keyword">in</span> <span class="built_in">set</span>. Elapsed: 0.012 sec. </span><br><span class="line"></span><br><span class="line"><span class="comment"># 数据目录情况</span></span><br><span class="line">[root(host/tjtx148-16-25.58os.org)@tjtx162-17-78 partitioned_by_week]<span class="comment"># ll</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 19991227_1_1_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 20000103_2_2_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 10:20 20000103_3_3_0</span><br><span class="line">drwxr-x--- 2 101 101  10 Jun 13 17:15 detached</span><br><span class="line">-rw-r----- 1 101 101   1 Jun 13 17:15 format_version.txt</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>查询并查看执行计划</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查询一条数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> x <span class="keyword">from</span> partitioned_by_week <span class="keyword">where</span> d = <span class="string">'2000-01-05'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> x</span><br><span class="line"><span class="keyword">FROM</span> partitioned_by_week</span><br><span class="line"><span class="keyword">WHERE</span> d = <span class="string">'2000-01-05'</span></span><br><span class="line"></span><br><span class="line">┌─x─┐</span><br><span class="line">│ <span class="number">4</span> │</span><br><span class="line">└───┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383307</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; executeQuery: (<span class="keyword">from</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>:<span class="number">58492</span>) <span class="keyword">SELECT</span> x <span class="keyword">FROM</span> partitioned_by_week <span class="keyword">WHERE</span> d = <span class="string">'2000-01-05'</span></span><br><span class="line"><span class="comment">-- clickhouse将where条件自动优化为了PREWHERE，用来做数据过滤</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383577</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; InterpreterSelectQuery: MergeTreeWhereOptimizer: condition <span class="string">"d = '2000-01-05'"</span> moved <span class="keyword">to</span> PREWHERE</span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383734</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;<span class="keyword">Trace</span>&gt; AccessRightsContext (<span class="keyword">default</span>): <span class="keyword">Access</span> granted: <span class="keyword">SELECT</span>(d, x) <span class="keyword">ON</span> test.partitioned_by_week</span><br><span class="line"><span class="comment">-- 没有使用主键索引</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383836</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; test.partitioned_by_week (SelectExecutor): <span class="keyword">Key</span> condition: <span class="literal">unknown</span></span><br><span class="line"><span class="comment">-- 分区索引被启动</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383859</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; test.partitioned_by_week (SelectExecutor): MinMax <span class="keyword">index</span> condition: (<span class="keyword">column</span> <span class="number">0</span> <span class="keyword">in</span> [<span class="number">10961</span>, <span class="number">10961</span>])</span><br><span class="line"><span class="comment">-- 借助date类型的分区索引，本次查询仅扫描了一个分区目录</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383878</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; test.partitioned_by_week (SelectExecutor): Selected <span class="number">1</span> parts <span class="keyword">by</span> <span class="built_in">date</span>, <span class="number">1</span> parts <span class="keyword">by</span> <span class="keyword">key</span>, <span class="number">1</span> marks <span class="keyword">to</span> <span class="keyword">read</span> <span class="keyword">from</span> <span class="number">1</span> ranges</span><br><span class="line"><span class="comment">-- 最终需要读取到内存的预估数据量是1行</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383924</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;<span class="keyword">Trace</span>&gt; test.partitioned_by_week (SelectExecutor): Reading approx. <span class="number">8192</span> <span class="keyword">rows</span> <span class="keyword">with</span> <span class="number">1</span> streams</span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.383968</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;<span class="keyword">Trace</span>&gt; InterpreterSelectQuery: FetchColumns -&gt; <span class="keyword">Complete</span></span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.384464</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Information&gt; executeQuery: <span class="keyword">Read</span> <span class="number">1</span> <span class="keyword">rows</span>, <span class="number">3.00</span> B <span class="keyword">in</span> <span class="number">0.001</span> sec., <span class="number">915</span> <span class="keyword">rows</span>/sec., <span class="number">2.68</span> KiB/sec.</span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.384501</span> [ <span class="number">81</span> ] &#123;f0a4f689<span class="number">-76</span>f3<span class="number">-4342</span>-ab8f<span class="number">-2e8349</span>ca5970&#125; &lt;Debug&gt; MemoryTracker: Peak <span class="keyword">memory</span> <span class="keyword">usage</span> (<span class="keyword">for</span> <span class="keyword">query</span>): <span class="number">0.00</span> B.</span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.384574</span> [ <span class="number">81</span> ] &#123;&#125; &lt;Debug&gt; MemoryTracker: Peak <span class="keyword">memory</span> <span class="keyword">usage</span> (total): <span class="number">0.00</span> B.</span><br><span class="line"><span class="number">2020.06</span><span class="number">.27</span> <span class="number">10</span>:<span class="number">29</span>:<span class="number">58.384595</span> [ <span class="number">81</span> ] &#123;&#125; &lt;Information&gt; TCPHandler: Processed <span class="keyword">in</span> <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、MergeTree数据分区规则"><a href="#2、MergeTree数据分区规则" class="headerlink" title="2、MergeTree数据分区规则"></a>2、MergeTree数据分区规则</h3><p>​    从插入数据过程中，数据分区目录的变化可以看出，MergeTree的分区目录不是在表创建的时候就存在的，而是在写入数据的过程中被创建出来，也就是说如果仅创建了表结构，没有任何数据的时候，是不会有分区目录存在的。</p>
+<ul>
+<li><p>MergeTree数据分区目录命名规则</p>
+<p>利用上面的示例数据，我们可以看到数据目录都是类似于<code>19991227_1_1_0</code>的格式，它们是由MergeTree自己的规则来命名的，规则为<code>PartitionID_MinBlockNum_MaxBlockNum_Level</code></p>
+<p>示例数据中19991227 表示分区目录的ID，1_1 分别表示最小的数据块编号和最大的数据块编号，最后的_0 表示目前分区合并的层级</p>
+</li>
+</ul>
+<hr>
+<p>​    各部分的含义及命名规则如下：</p>
+<ul>
+<li><p><code>PartitionID</code>：MergeTree数据分区的规则是由分区ID来决定，分区ID的值则是由插入数据时分区键的取值来决定的。分区键支持使用任何一个或一组字段表达式来声明，针对取值数据类型的不同，分区ID的生成逻辑目前有四种规则</p>
+<ul>
+<li><p>不指定分区键：如果建表时未指定分区键，则分区ID默认使用all，所有数据都被写入all分区中</p>
+</li>
+<li><p>整型字段：如果分区键取值是整型字段，并且无法转换为YYYYMMDD的格式，则会按照该整型字段的字符形式输出，作为分区ID取值</p>
+</li>
+<li><p>日期类型：如果分区键属于日期格式，或可以转换为YYYYMMDD格式的整型，则按照YYYYMMDD格式化后的字符形式输出，作为分区ID取值</p>
+</li>
+<li><p>其他类型：如果使用其他类似Float、String等类型作为分区键，会通过对其插入数据的128位Hash值作为分区ID的取值  </p>
+</li>
+<li><p><img src="/2020/06/27/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%88%86%E5%8C%BA/fenqu_1.png" alt></p>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p><code>MinBlockNum</code>和<code>MaxBlockNum</code>：BlockNum是一个整型的自增长型编号，该编号在单张MergeTree表中从1开始全局累加，当有新的分区目录创建后，该值就加1，对新的分区目录来讲，MinBlockNum和MaxBlockNum取值相同。例如上面示例数据为<code>19991227_1_1_0</code>和<code>20000103_2_2_0</code>，但当分区目录进行合并后，取值规则会发生变化</p>
+</li>
+<li><p><code>Level</code>：表示合并的层级。相当于某个分区被合并的次数，它不是以表全局累加，而是以分区为单位，初始创建的分区，初始值为0，相同分区ID发生合并动作时，在相应分区内累计加1</p>
+</li>
+</ul>
+<h2 id="二、MergeTree数据分区合并规则"><a href="#二、MergeTree数据分区合并规则" class="headerlink" title="二、MergeTree数据分区合并规则"></a>二、MergeTree数据分区合并规则</h2><p>​    示例数据以周为分区，可以看出<code>2000-01-02, 2</code>和<code>2000-01-03, 3</code>两条数据最终产生了两个相同分区ID的数据目录<code>20000103_2_2_0</code>和<code>20000103_3_3_0</code>，由于它们是通过两条不同的sql插入进去的数据，所以，在ClickHouse中，即使数据属于相同分区，不同批次写入的数据，MergeTree都会生成不同的分区目录，对于同一个分区而言，会存在多个分区目录的情况。</p>
+<p>​    MergeTree可以通过分区合并将属于相同分区的多个目录合并为一个新的目录(官方描述在10到15分钟内会进行合并&lt;控制该值的参数目前还未找到&gt;，也可直接执行optimize语句)，已经存在的就目录在之后某个时刻通过后台任务被删除(默认8分钟之后，暂未找到控制该值的参数)。</p>
+<h3 id="1、合并分区后的命名规则"><a href="#1、合并分区后的命名规则" class="headerlink" title="1、合并分区后的命名规则"></a>1、合并分区后的命名规则</h3><p>​    同个分区的数据目录合并后会产生一个新的目录，目录中的索引和数据文件也会进行合并，新目录的命名规则如下：</p>
+<ul>
+<li>PartitionID：分区ID保持不变</li>
+<li>MinBlockNum：取同一个分区内所有目录中最小的MinBlockNum值</li>
+<li>MaxBlockNUm：取同一个分区内所有目录中最大的MaxBlockNum值</li>
+<li>Level：取同一个分区内最大Level值并加1</li>
+</ul>
+<h3 id="2、示例"><a href="#2、示例" class="headerlink" title="2、示例"></a>2、示例</h3><p>​    按照示例的两个数据目录以及合并的命名规则，可以得到新的数据目录中PartitionID仍然为<code>20000103</code>，MinBlockNum取两个目录中该值的最小值为2，MaxBlockNum取该值的最大值为3，Level原目录都为0加1等于1，故合并后的目录名称为<code>20000103_2_3_1</code>。</p>
+<img src="/2020/06/27/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%88%86%E5%8C%BA/fenqu_2.png" style="zoom:50%;">
+
+<p>​    再次插入一个20000103分区的数据进行合并后的目录名称会为<code>20000103_2_4_2</code>，过程如下：</p>
+<ol>
+<li>插入数据</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 插入一条新的数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">insert</span> <span class="keyword">into</span> partitioned_by_week(d, x) <span class="keyword">values</span>(<span class="string">'2000-01-04'</span>, <span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> partitioned_by_week (d, x) <span class="keyword">VALUES</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> partitioned_by_week</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> partitioned_by_week</span><br><span class="line"></span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ <span class="number">2000</span><span class="number">-01</span><span class="number">-03</span> │ <span class="number">3</span> │</span><br><span class="line">│ <span class="number">2000</span><span class="number">-01</span><span class="number">-05</span> │ <span class="number">4</span> │</span><br><span class="line">└────────────┴───┘</span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ <span class="number">2000</span><span class="number">-01</span><span class="number">-01</span> │ <span class="number">1</span> │</span><br><span class="line">│ <span class="number">2000</span><span class="number">-01</span><span class="number">-02</span> │ <span class="number">2</span> │</span><br><span class="line">└────────────┴───┘</span><br><span class="line">┌──────────d─┬─x─┐</span><br><span class="line">│ <span class="number">2000</span><span class="number">-01</span><span class="number">-04</span> │ <span class="number">4</span> │</span><br><span class="line">└────────────┴───┘</span><br><span class="line"></span><br><span class="line"><span class="number">5</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>产生新的数据目录</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxx <span class="built_in">test</span>]<span class="comment"># ll partitioned_by_week/</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 19991227_1_1_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 11:26 20000103_2_3_1</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 12:12 20000103_4_4_0</span><br><span class="line">drwxr-x--- 2 101 101  10 Jun 13 17:15 detached</span><br><span class="line">-rw-r----- 1 101 101   1 Jun 13 17:15 format_version.txt</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>进行合并</li>
+</ol>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">clickhouse-server_1 :) <span class="keyword">optimize</span> <span class="keyword">table</span> partitioned_by_week</span><br><span class="line"></span><br><span class="line"><span class="keyword">OPTIMIZE</span> <span class="keyword">TABLE</span> partitioned_by_week</span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>合并后数据目录发生变化</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 旧数据目录20000103_2_3_1和20000103_4_4_0会在一段时间后被后台删除</span></span><br><span class="line">[root@xxxx <span class="built_in">test</span>]<span class="comment"># ll partitioned_by_week/</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 19991227_1_1_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 11:26 20000103_2_3_1</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 12:14 20000103_2_4_2</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 12:12 20000103_4_4_0</span><br><span class="line">drwxr-x--- 2 101 101  10 Jun 13 17:15 detached</span><br><span class="line">-rw-r----- 1 101 101   1 Jun 13 17:15 format_version.txt</span><br></pre></td></tr></table></figure>
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>
