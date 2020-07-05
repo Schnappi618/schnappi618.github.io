@@ -152,7 +152,7 @@
 <p>​    ClickHouse的一级索引使用了稀疏索引实现，即每一行索引表计对应的是一段数据，而不是一行数据。它使用少量的索引标记就可以记录大量数据的区间位置信息。</p>
 <h3 id="1、索引粒度"><a href="#1、索引粒度" class="headerlink" title="1、索引粒度"></a>1、索引粒度</h3><p>​    ClickHouse通过<code>index_granularity</code>参数来控制索引粒度，默认为8192，最新版本可以使用自适应索引粒度大小，则标记文件会被命名为(column.mrk2)。数据会以该参数的大小被标记为多个小区间，每个区间默认最多8192行数据，MergeTree使用MarkRange来表示一个具体区间，并通过start和end表示具体范围。</p>
 <p>​    在ClickHouse中，索引粒度不仅影响一级索引(primary.idx)，同时也影响数据标记文件(column.mrk)和数据文件(column.bin)。这是由于MergeTree无法只通过索引来完成查询工作，通过标记文件建立以稀疏索引(primary.idx)和对应数据文件(column.bin)的映射关系，MergeTree会先通过稀疏索引(primary.idx)找到对应数据的偏移量信息(column.mrk)，再通过偏移量直接从数据文件(column.bin)读取数据。所以一级索引和数据标记的间隔粒度相同，均有<code>index_granularity</code>参数决定，数据文件也会依据该参数生成压缩数据块。</p>
-<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_1.png" alt="MergeTree按照索引粒度划分数据" style="zoom:67%;">
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_1.png" alt="MergeTree按照索引粒度划分数据" style="zoom:50%;">
 
 <h3 id="2、索引数据的生成规则"><a href="#2、索引数据的生成规则" class="headerlink" title="2、索引数据的生成规则"></a>2、索引数据的生成规则</h3><p>​    MergeTree需要间隔index_granularity行数据才会生成一条索引记录，索引值会依据声明的主键字段来获取。例如官方提供的测试数据表hits_v1使用了年月分区(PARTITION BY toYYYYMM(EventDate))，如果使用CounterID作为主键，则每间隔8192行数据就会取一次CounterID的值作为索引值，索引数据最终写入parimary.idx文件中保存。</p>
 <img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_2.png" style="zoom:60%;">
@@ -161,7 +161,7 @@
 <h2 id="二、索引的查询过程"><a href="#二、索引的查询过程" class="headerlink" title="二、索引的查询过程"></a>二、索引的查询过程</h2><p>​    MarkRange在ClickHouse中用来定义标记区间，MergeTree按照index_granularity设置的索引粒度，将一段完整的数据划分成了多个小的间隔数据段，一个数据段则是一个MarkRange，它与索引编号对应，使用start和end两个属性表示区间范围，通过start和end对应的索引编号的取值，可以得到它所对应的数值区间，数值区间则表示了该MarkRange的数据范围。</p>
 <p>​    假如一份测试数据，共有192条记录。其中主键ID为String类型，ID取值从A000开始，后面依次为A001、A002…A191。MergeTree的索引粒度为index_granularity=3，根据索引的生成规则，primary.idx文件内的索引数据会为<code>A000A003A006A009A012...A186A189</code></p>
 <p>​    根据索引数据，MergeTree会将此数据片段分为192/3 = 64个小的MarkRange，两个相邻MarkRange相距步长为1，所有MarkRange(整个数据片段)的最大数值区间为[A000, +inf)。MarkRange和数值区间范围示意图如下：</p>
-<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_3.png" style="zoom:67%;">
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_3.png" style="zoom:60%;">
 
 <p>​    索引的查询其实为基于主键的查询条件转换的条件区间和MarkRange对应的数值区间这两个区间的交集判断。整个查询过程可分为以下三个步骤：</p>
 <ol>
@@ -181,7 +181,7 @@
 </li>
 </ol>
 <p>大致流程图如下：</p>
-<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_4.png" style="zoom:67%;">
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_4.png" style="zoom:60%;">
 
 
         
