@@ -234,6 +234,7 @@
 </ol>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 旧数据目录20000103_2_3_1和20000103_4_4_0会在一段时间后被后台删除</span></span><br><span class="line">[root@xxxx <span class="built_in">test</span>]<span class="comment"># ll partitioned_by_week/</span></span><br><span class="line">total 4</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 13 17:18 19991227_1_1_0</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 11:26 20000103_2_3_1</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 12:14 20000103_2_4_2</span><br><span class="line">drwxr-x--- 2 101 101 221 Jun 27 12:12 20000103_4_4_0</span><br><span class="line">drwxr-x--- 2 101 101  10 Jun 13 17:15 detached</span><br><span class="line">-rw-r----- 1 101 101   1 Jun 13 17:15 format_version.txt</span><br></pre></td></tr></table></figure>
 
+<p>​    可以看到，分区目录发生合并之后，旧分区目录不会被立即删除，此时旧分区目录在<code>system.parts</code>分区详情表中状态会处于未激活状态(active=0)，故查询数据时，这部分分区的数据会被自动过滤。</p>
 
         
             <div class="donate-container">

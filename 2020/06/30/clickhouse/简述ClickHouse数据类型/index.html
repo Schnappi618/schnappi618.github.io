@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        简述ClickHouse数据类型 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse的数据类型"><span class="toc-text">一、ClickHouse的数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、基础数据类型"><span class="toc-text">二、基础数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、数值型"><span class="toc-text">1、数值型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-整型-Int"><span class="toc-text">1.1 整型 Int</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-浮点型-Float"><span class="toc-text">1.2 浮点型 Float</span></a></li></ol></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        简述ClickHouse数据类型
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-06-30 19:54:10</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​    ClickHouse作为一个DBMS，提供了DDL和DML的功能，并支持部分标准的SQL语法。但ClickHouse在基础数据方面，既提供了常规的数据类型、字符串类型格式，又提供了一些常用的复合类型(数组、元组等)，并且与常规的数据库，在DML的使用上也存在不同(例如：UPDATE和DELETE是借助ALTER实现的)。本文将简单介绍ClickHouse所提供的各种数据类型。</p>
+<h2 id="一、ClickHouse的数据类型"><a href="#一、ClickHouse的数据类型" class="headerlink" title="一、ClickHouse的数据类型"></a>一、ClickHouse的数据类型</h2><p>​    <strong>ClickHouse提供了许多数据类型，可以分为基础类型、符合类型和特殊类型</strong>，可进入clickhouse数据库中，通过<code>select * from system.data_type_families</code>查询所支持的所有数据类型。</p>
+<h2 id="二、基础数据类型"><a href="#二、基础数据类型" class="headerlink" title="二、基础数据类型"></a>二、基础数据类型</h2><p>​    ClickHouse基础数据类型可分为数值、字符串和时间三种类型，没有Boolean类型，可用整型的0和1来替代。</p>
+<h3 id="1、数值型"><a href="#1、数值型" class="headerlink" title="1、数值型"></a>1、数值型</h3><h4 id="1-1-整型-Int"><a href="#1-1-整型-Int" class="headerlink" title="1.1 整型 Int"></a>1.1 整型 Int</h4><p>​    在MySQL中，使用Tinyint、smallint、int和bigint来指代整数类型的取值。ClickHouse中使用了Int8、Int16、Int32、Int64来分别指代不同大小的Int类型(末尾数字表明占用字节大小，1字节=8位)，具体对比关系如下：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>字节大小</th>
+<th>范围</th>
+<th>MySQL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Int8</td>
+<td>1</td>
+<td>-128到127</td>
+<td>Tinyint</td>
+</tr>
+<tr>
+<td>Int16</td>
+<td>2</td>
+<td>-32768到32767</td>
+<td>Smallint</td>
+</tr>
+<tr>
+<td>Int32</td>
+<td>4</td>
+<td>-2147483648到214783647</td>
+<td>Int</td>
+</tr>
+<tr>
+<td>Int64</td>
+<td>8</td>
+<td>-9223372036854775808到9223372036854775807</td>
+<td>Bigint</td>
+</tr>
+<tr>
+<td>UInt8</td>
+<td>1</td>
+<td>0到255</td>
+<td>Tinyint Unsinged</td>
+</tr>
+<tr>
+<td>UInt16</td>
+<td>2</td>
+<td>0到65535</td>
+<td>Smallint Unsigned</td>
+</tr>
+<tr>
+<td>UInt32</td>
+<td>4</td>
+<td>0到4294967295</td>
+<td>Int Unsigned</td>
+</tr>
+<tr>
+<td>UInt64</td>
+<td>8</td>
+<td>0到18446744073709551615</td>
+<td>Bigint Unsigned</td>
+</tr>
+</tbody></table>
+<h4 id="1-2-浮点型-Float"><a href="#1-2-浮点型-Float" class="headerlink" title="1.2 浮点型 Float"></a>1.2 浮点型 Float</h4>
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>

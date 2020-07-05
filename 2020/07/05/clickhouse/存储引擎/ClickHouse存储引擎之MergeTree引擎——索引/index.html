@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        ClickHouse存储引擎之MergeTree引擎——索引 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、一级索引"><span class="toc-text">一、一级索引</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、索引粒度"><span class="toc-text">1、索引粒度</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、索引数据的生成规则"><span class="toc-text">2、索引数据的生成规则</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、索引的查询过程"><span class="toc-text">二、索引的查询过程</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        ClickHouse存储引擎之MergeTree引擎——索引
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-07-05 20:16:36</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#engine" title="engine">engine</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#MergeTree" title="MergeTree">MergeTree</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h2 id="一、一级索引"><a href="#一、一级索引" class="headerlink" title="一、一级索引"></a>一、一级索引</h2><p>​    MergeTree的主键使用PRIMARY KEY来定义，MergeTree会根据index_granularity间隔(默认8192行)，为数据表生成一级索引并保存到primary.idx文件里，索引数据会按照PRIMARY KEY排序，所以，ClickHouse中经常通过ORDER BY来代替主键。此时，索引(primary.idx)和数据文件(column.bin)会按照相同的规则排序</p>
+<p>​    ClickHouse的一级索引使用了稀疏索引实现，即每一行索引表计对应的是一段数据，而不是一行数据。它使用少量的索引标记就可以记录大量数据的区间位置信息。</p>
+<h3 id="1、索引粒度"><a href="#1、索引粒度" class="headerlink" title="1、索引粒度"></a>1、索引粒度</h3><p>​    ClickHouse通过<code>index_granularity</code>参数来控制索引粒度，默认为8192，最新版本可以使用自适应索引粒度大小，则标记文件会被命名为(column.mrk2)。数据会以该参数的大小被标记为多个小区间，每个区间默认最多8192行数据，MergeTree使用MarkRange来表示一个具体区间，并通过start和end表示具体范围。</p>
+<p>​    在ClickHouse中，索引粒度不仅影响一级索引(primary.idx)，同时也影响数据标记文件(column.mrk)和数据文件(column.bin)。这是由于MergeTree无法只通过索引来完成查询工作，通过标记文件建立以稀疏索引(primary.idx)和对应数据文件(column.bin)的映射关系，MergeTree会先通过稀疏索引(primary.idx)找到对应数据的偏移量信息(column.mrk)，再通过偏移量直接从数据文件(column.bin)读取数据。所以一级索引和数据标记的间隔粒度相同，均有<code>index_granularity</code>参数决定，数据文件也会依据该参数生成压缩数据块。</p>
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_1.png" alt="MergeTree按照索引粒度划分数据" style="zoom:67%;">
+
+<h3 id="2、索引数据的生成规则"><a href="#2、索引数据的生成规则" class="headerlink" title="2、索引数据的生成规则"></a>2、索引数据的生成规则</h3><p>​    MergeTree需要间隔index_granularity行数据才会生成一条索引记录，索引值会依据声明的主键字段来获取。例如官方提供的测试数据表hits_v1使用了年月分区(PARTITION BY toYYYYMM(EventDate))，如果使用CounterID作为主键，则每间隔8192行数据就会取一次CounterID的值作为索引值，索引数据最终写入parimary.idx文件中保存。</p>
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_2.png" style="zoom:60%;">
+
+<p>​    以上是使用单个字段作为主键的情况，若使用多个主键，例<code>ORDER BY(CounterID, EventDate)</code>，则每间隔8192行同时取CounterID和EventDate两列值作为索引，上述例子，索引值将为<code>572014-03-1716352014-03-1832662014-03-19</code></p>
+<h2 id="二、索引的查询过程"><a href="#二、索引的查询过程" class="headerlink" title="二、索引的查询过程"></a>二、索引的查询过程</h2><p>​    MarkRange在ClickHouse中用来定义标记区间，MergeTree按照index_granularity设置的索引粒度，将一段完整的数据划分成了多个小的间隔数据段，一个数据段则是一个MarkRange，它与索引编号对应，使用start和end两个属性表示区间范围，通过start和end对应的索引编号的取值，可以得到它所对应的数值区间，数值区间则表示了该MarkRange的数据范围。</p>
+<p>​    假如一份测试数据，共有192条记录。其中主键ID为String类型，ID取值从A000开始，后面依次为A001、A002…A191。MergeTree的索引粒度为index_granularity=3，根据索引的生成规则，primary.idx文件内的索引数据会为<code>A000A003A006A009A012...A186A189</code></p>
+<p>​    根据索引数据，MergeTree会将此数据片段分为192/3 = 64个小的MarkRange，两个相邻MarkRange相距步长为1，所有MarkRange(整个数据片段)的最大数值区间为[A000, +inf)。MarkRange和数值区间范围示意图如下：</p>
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_3.png" style="zoom:67%;">
+
+<p>​    索引的查询其实为基于主键的查询条件转换的条件区间和MarkRange对应的数值区间这两个区间的交集判断。整个查询过程可分为以下三个步骤：</p>
+<ol>
+<li><p>生成查询条件区间。</p>
+<p>例如：</p>
+<p>条件为 <code>WHERE ID = &#39;A003&#39;</code>,条件区间会转换为<code>[&#39;A003&#39;, &#39;A003&#39;]</code>;</p>
+<p>条件为<code>WHEER ID &gt; &#39;A000&#39;</code>,条件区间会转换为<code>[&#39;A000&#39;, +inf]</code>;</p>
+</li>
+<li><p>递归交集判断：以递归的形式，依次对MarkRange的数值区间与条件区间做交集判断。从最大的MarkRange区间<code>[A000,+inf]</code>开始</p>
+<ol>
+<li>如果不存在交集，则直接去掉整段MarkRange数据</li>
+<li>存在交集，且MarkRange步长大于8(end - start)，则将此区间进一步拆分成8个字区间(由merge_tree_coarse_index_granularity指定，默认为8)，不断重复，做交集判断</li>
+<li>存在交集，并且MarkRange不可被再分解(步长小于8)，则记录MarkRange并返回</li>
+</ol>
+</li>
+<li><p>合并MarkRange区间：将最终匹配的MarkRange聚合</p>
+</li>
+</ol>
+<p>大致流程图如下：</p>
+<img src="/2020/07/05/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E7%B4%A2%E5%BC%95/suoyin_4.png" style="zoom:67%;">
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>
