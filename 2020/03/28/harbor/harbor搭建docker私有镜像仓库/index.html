@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -26,11 +26,11 @@
     <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
     <!-- ga & ba script hoook -->
     <script></script>
-<meta name="generator" content="Hexo 4.2.0"></head>
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
 
 <body>
 
-<div class="site-nav-toggle" id="site-nav-toggle">
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="site-nav-toggle" id="site-nav-toggle">
     <button>
         <span class="btn-bar"></span>
         <span class="btn-bar"></span>
@@ -132,10 +132,10 @@
         
         <span class="attr">标签：/
         
-        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+        <a class="tag" href="/tags/#harbor" title="harbor">harbor</a>
         <span>/</span>
         
-        <a class="tag" href="/tags/#harbor" title="harbor">harbor</a>
+        <a class="tag" href="/tags/#docker" title="docker">docker</a>
         <span>/</span>
         
         
@@ -166,8 +166,8 @@
 <img src="/2020/03/28/harbor/harbor%E6%90%AD%E5%BB%BAdocker%E7%A7%81%E6%9C%89%E9%95%9C%E5%83%8F%E4%BB%93%E5%BA%93/1.png" style="zoom:50%;">
 
 <ul>
-<li><a href="https://schnappi618.github.io/2020/03/07/利用docker安装启动ClickHouse/">docker安装参考</a></li>
-<li><a href="https://schnappi618.github.io/2020/03/28/docker-compose定制clickhouse配置启动/">docker-compose安装参考</a></li>
+<li><a href="https://schnappi618.github.io/2020/03/07/%E5%88%A9%E7%94%A8docker%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8ClickHouse/">docker安装参考</a></li>
+<li><a href="https://schnappi618.github.io/2020/03/28/docker-compose%E5%AE%9A%E5%88%B6clickhouse%E9%85%8D%E7%BD%AE%E5%90%AF%E5%8A%A8/">docker-compose安装参考</a></li>
 </ul>
 <h2 id="2、搭建过程"><a href="#2、搭建过程" class="headerlink" title="2、搭建过程"></a>2、搭建过程</h2><p>​        目前Harbor最新版本为1.10.1，<a href="https://github.com/goharbor/harbor/releases/download/v1.10.1/harbor-offline-installer-v1.10.1.tgz" target="_blank" rel="noopener">可点击此处下载该版本安装包</a></p>
 <h4 id="1、下载解压"><a href="#1、下载解压" class="headerlink" title="1、下载解压"></a>1、下载解压</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[root@xxxx harbor]<span class="comment"># ll -h</span></span><br><span class="line">total 643M</span><br><span class="line">-rw-r--r-- 1 root root 643M Mar 26 00:24 harbor-offline-installer-v1.10.1.tgz</span><br><span class="line"><span class="comment"># 解压该安装包</span></span><br><span class="line">[root@xxxx harbor]<span class="comment"># tar zxvf harbor-offline-installer-v1.10.1.tgz </span></span><br><span class="line">harbor/harbor.v1.10.1.tar.gz</span><br><span class="line">harbor/prepare				<span class="comment"># 执行一些创建目录等准备工作的脚本</span></span><br><span class="line">harbor/LICENSE</span><br><span class="line">harbor/install.sh			<span class="comment"># harbor安装脚本，配置文件修改完成后直接执行该脚本，若无报错，即可安装完成</span></span><br><span class="line">harbor/common.sh			<span class="comment"># 安装前检查docker、docker-compose等基础环境是否符合安装要求脚本,install.sh脚本中将该脚本先执行</span></span><br><span class="line">harbor/harbor.yml			<span class="comment"># harbor的配置文件</span></span><br></pre></td></tr></table></figure>
@@ -286,7 +286,7 @@
             <span id="busuanzi_value_site_uv"></span>UV
         </span>
         Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
-</footer>
+</footer><!-- hexo-inject:begin --><!-- hexo-inject:end -->
 
 
 

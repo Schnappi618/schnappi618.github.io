@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="schnappi_xxn">
+    <meta name="keyword"  content="">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        简述ClickHouse数据类型 - Schnappi618的博客 | schnappi618&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    
+<link rel="stylesheet" href="/css/aircloud.css">
+
+    
+<link rel="stylesheet" href="/css/gitment.css">
+
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+
+<body>
+
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> You only care about kindness, and God has its own measure </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar radius">
+            <img src="/img/logo.png" />
+        </div>
+        <div class="name">
+            <i>Schnappi618</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archives">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse的数据类型"><span class="toc-text">一、ClickHouse的数据类型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、基础数据类型"><span class="toc-text">二、基础数据类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、数值型"><span class="toc-text">1、数值型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-1-Int"><span class="toc-text">1.1 Int</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-2-Float"><span class="toc-text">1.2 Float</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#1-3-Decimal"><span class="toc-text">1.3 Decimal</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、字符串类型"><span class="toc-text">2、字符串类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#2-1-String"><span class="toc-text">2.1 String</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-2-FixedString"><span class="toc-text">2.2 FixedString</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-3-UUID"><span class="toc-text">2.3 UUID</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、时间类型"><span class="toc-text">3、时间类型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#3-1-DateTime"><span class="toc-text">3.1 DateTime</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-2-DateTime64"><span class="toc-text">3.2 DateTime64</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-3-Date"><span class="toc-text">3.3 Date</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、复合类型"><span class="toc-text">三、复合类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、数组Array"><span class="toc-text">1、数组Array</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、元组Tuple"><span class="toc-text">2、元组Tuple</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、枚举Enum"><span class="toc-text">3、枚举Enum</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4、嵌套Nested"><span class="toc-text">4、嵌套Nested</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、其他类型"><span class="toc-text">四、其他类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、Nullable"><span class="toc-text">1、Nullable</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、Domain"><span class="toc-text">2、Domain</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> You only care about kindness, and God has its own measure </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        简述ClickHouse数据类型
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-07-12 10:54:10</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>​    ClickHouse作为一个DBMS，提供了DDL和DML的功能，并支持部分标准的SQL语法。但ClickHouse在基础数据方面，既提供了常规的数据类型、字符串类型格式，又提供了一些常用的复合类型(数组、元组等)，并且与常规的数据库，在DML的使用上也存在不同(例如：UPDATE和DELETE是借助ALTER实现的)。本文将简单介绍ClickHouse所提供的各种数据类型。</p>
+<h2 id="一、ClickHouse的数据类型"><a href="#一、ClickHouse的数据类型" class="headerlink" title="一、ClickHouse的数据类型"></a>一、ClickHouse的数据类型</h2><p>​    <strong>ClickHouse提供了许多数据类型，可以分为基础类型、符合类型和特殊类型</strong>，可进入clickhouse数据库中，通过<code>select * from system.data_type_families</code>查询所支持的所有数据类型。</p>
+<h2 id="二、基础数据类型"><a href="#二、基础数据类型" class="headerlink" title="二、基础数据类型"></a>二、基础数据类型</h2><p>​    ClickHouse基础数据类型可分为数值、字符串和时间三种类型，没有Boolean类型，可用整型的0和1来替代。</p>
+<h3 id="1、数值型"><a href="#1、数值型" class="headerlink" title="1、数值型"></a>1、数值型</h3><p>数值型可分为Int、Float和Decimal三种类型</p>
+<h4 id="1-1-Int"><a href="#1-1-Int" class="headerlink" title="1.1 Int"></a>1.1 Int</h4><p>​    在MySQL中，使用Tinyint、smallint、int和bigint来指代整数类型的取值。ClickHouse中使用了Int8、Int16、Int32、Int64来分别指代不同大小的Int类型(末尾数字表明占用字节大小，1字节=8位)，具体对比关系如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">字节大小</th>
+<th>范围</th>
+<th align="center">MySQL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Int8</td>
+<td align="center">1</td>
+<td>-128到127</td>
+<td align="center">Tinyint</td>
+</tr>
+<tr>
+<td align="center">Int16</td>
+<td align="center">2</td>
+<td>-32768到32767</td>
+<td align="center">Smallint</td>
+</tr>
+<tr>
+<td align="center">Int32</td>
+<td align="center">4</td>
+<td>-2147483648到214783647</td>
+<td align="center">Int</td>
+</tr>
+<tr>
+<td align="center">Int64</td>
+<td align="center">8</td>
+<td>-9223372036854775808到9223372036854775807</td>
+<td align="center">Bigint</td>
+</tr>
+<tr>
+<td align="center">UInt8</td>
+<td align="center">1</td>
+<td>0到255</td>
+<td align="center">Tinyint Unsinged</td>
+</tr>
+<tr>
+<td align="center">UInt16</td>
+<td align="center">2</td>
+<td>0到65535</td>
+<td align="center">Smallint Unsigned</td>
+</tr>
+<tr>
+<td align="center">UInt32</td>
+<td align="center">4</td>
+<td>0到4294967295</td>
+<td align="center">Int Unsigned</td>
+</tr>
+<tr>
+<td align="center">UInt64</td>
+<td align="center">8</td>
+<td>0到18446744073709551615</td>
+<td align="center">Bigint Unsigned</td>
+</tr>
+</tbody></table>
+<h4 id="1-2-Float"><a href="#1-2-Float" class="headerlink" title="1.2 Float"></a>1.2 Float</h4><p>​    ClickHouse使用了Float32和Float64来代表单精度浮点数一级双精度浮点数，具体对比关系如下，使用浮点数会引起四舍五入的误差：</p>
+<table>
+<thead>
+<tr>
+<th align="center">名称</th>
+<th align="center">大小(字节)</th>
+<th align="center">有效精度(位数)</th>
+<th align="center">C语言类型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Float32</td>
+<td align="center">4</td>
+<td align="center">7</td>
+<td align="center">float</td>
+</tr>
+<tr>
+<td align="center">Float64</td>
+<td align="center">8</td>
+<td align="center">16</td>
+<td align="center">Double</td>
+</tr>
+</tbody></table>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 转换为Float32类型</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toFloat32(<span class="string">'0.123456789098765432'</span>) <span class="keyword">as</span> a, toTypeName(a);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toFloat32(<span class="string">'0.123456789098765432'</span>) <span class="keyword">AS</span> a, </span><br><span class="line">    toTypeName(a)</span><br><span class="line"></span><br><span class="line">┌──────────a─┬─toTypeName(toFloat32(<span class="string">'0.123456789098765432'</span>))─┐</span><br><span class="line">│ <span class="number">0.12345679</span> │ Float32                                       │</span><br><span class="line">└────────────┴───────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 转换为Float64类型</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toFloat64(<span class="string">'0.123456789098765432'</span>) <span class="keyword">as</span> a, toTypeName(a);</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toFloat64(<span class="string">'0.123456789098765432'</span>) <span class="keyword">AS</span> a, </span><br><span class="line">    toTypeName(a)</span><br><span class="line"></span><br><span class="line">┌───────────────────a─┬─toTypeName(toFloat64(<span class="string">'0.123456789098765432'</span>))─┐</span><br><span class="line">│ <span class="number">0.12345678909876544</span> │ Float64                                       │</span><br><span class="line">└─────────────────────┴───────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.003</span> sec.</span><br></pre></td></tr></table></figure>
+
+<p>​    和标准的SQL相比，ClickHouse还支持了以下类别的浮点数：</p>
+<ul>
+<li><p>Inf：正无穷</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> <span class="number">0.5</span>/<span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="number">0.5</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line">┌─divide(<span class="number">0.5</span>, <span class="number">0</span>)─┐</span><br><span class="line">│            inf │</span><br><span class="line">└────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.007</span> sec.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>-Inf：负无穷</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> <span class="number">-0.5</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="number">-0.5</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line">┌─divide(<span class="number">-0.5</span>, <span class="number">0</span>)─┐</span><br><span class="line">│            -inf │</span><br><span class="line">└─────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.001</span> sec.</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>NaN：非数字</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> <span class="number">0</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> <span class="number">0</span> / <span class="number">0</span></span><br><span class="line"></span><br><span class="line">┌─divide(<span class="number">0</span>, <span class="number">0</span>)─┐</span><br><span class="line">│          <span class="keyword">nan</span> │</span><br><span class="line">└──────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="1-3-Decimal"><a href="#1-3-Decimal" class="headerlink" title="1.3 Decimal"></a>1.3 Decimal</h4><p>​    在高精度的数值运算中，会使用Decimal类型。ClickHouse提供了Decimal32、Decimal64和Decimal128三种精度的定点数，可通过<code>Decimal(P, S)</code>或简写<code>Decimal32(S), Decimal64(S), Decimal128(S)</code>来表示定义，参数含义如下：</p>
+<ul>
+<li>P表示精度，有效范围为[1, 38]，决定总位数(整数部分+小数部分)</li>
+<li>S表示规模，有效范围为[0, P]，决定小数位数</li>
+</ul>
+<p>简写方式和原生方式的对应如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">简写</th>
+<th align="center">原生</th>
+<th align="center">范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Decimal32(S)</td>
+<td align="center">Decimal(1~9, S)</td>
+<td align="center">$-1 * 10^(9 - S)$ 到 $1 * 10^(9 - S)$</td>
+</tr>
+<tr>
+<td align="center">Decimal64(S)</td>
+<td align="center">Decimal(10~18, S)</td>
+<td align="center">$-1 * 10^(18 - S)$ 到 $1 * 10^(18 - S)$</td>
+</tr>
+<tr>
+<td align="center">Decimal128(S)</td>
+<td align="center">Decimal(19~38, S)</td>
+<td align="center">$-1 * 10^(38 - S)$ 到 $1 * 10^(38 - S)$</td>
+</tr>
+</tbody></table>
+<p>​    使用两个不同精度的定点数进行元算的话，他们小数位数S会发生变化：</p>
+<ul>
+<li>加法：S = max(S1, S2)</li>
+<li>减法：S = max(S1, S2)</li>
+<li>乘法：S = S1 + S2</li>
+<li>除法：S = S1  (S1 为被除数，且被除数S1必须大于除数S2，即S1 / S2)</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 加法示例</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toDecimal32(<span class="number">2</span>,<span class="number">4</span>) + toDecimal64(<span class="number">2</span>,<span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> toDecimal32(<span class="number">2</span>, <span class="number">4</span>) + toDecimal64(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">┌─plus(toDecimal32(<span class="number">2</span>, <span class="number">4</span>), toDecimal64(<span class="number">2</span>, <span class="number">2</span>))─┐</span><br><span class="line">│                                     <span class="number">4.0000</span> │</span><br><span class="line">└────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.006</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 减法示例</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toDecimal32(<span class="number">4</span>, <span class="number">6</span>) - toDecimal64(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> toDecimal32(<span class="number">4</span>, <span class="number">6</span>) - toDecimal64(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">┌─<span class="keyword">minus</span>(toDecimal32(<span class="number">4</span>, <span class="number">6</span>), toDecimal64(<span class="number">2</span>, <span class="number">2</span>))─┐</span><br><span class="line">│                                    <span class="number">2.000000</span> │</span><br><span class="line">└─────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.003</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 3. 乘法示例</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toDecimal64(<span class="number">4</span>, <span class="number">4</span>) * toDecimal32(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> toDecimal64(<span class="number">4</span>, <span class="number">4</span>) * toDecimal32(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">┌─multiply(toDecimal64(<span class="number">4</span>, <span class="number">4</span>), toDecimal32(<span class="number">2</span>, <span class="number">2</span>))─┐</span><br><span class="line">│                                       <span class="number">8.000000</span> │</span><br><span class="line">└────────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 4. 除法示例</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> toDecimal64(<span class="number">4</span>, <span class="number">4</span>) / toDecimal32(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> toDecimal64(<span class="number">4</span>, <span class="number">4</span>) / toDecimal32(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">┌─divide(toDecimal64(<span class="number">4</span>, <span class="number">4</span>), toDecimal32(<span class="number">2</span>, <span class="number">2</span>))─┐</span><br><span class="line">│                                       <span class="number">2.0000</span> │</span><br><span class="line">└──────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.003</span> sec.</span><br></pre></td></tr></table></figure>
+
+<p><strong>溢出检查：</strong></p>
+<p>对Decimal进行操作时，数值可能会发生溢出。小数部分过多数字会被丢弃(不是四舍五入)，整数数字过多会导致异常。可通过设置<code>decimal_check_overflow</code>来关闭溢出检查，但溢出会导致结果不正确，而且会让计算变慢。在比较计算上也会发生溢出。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 数值溢出，x/3的结果本应为无限循环小数，只保留了S位，其余小数被丢弃</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SELECT</span> toDecimal32(<span class="number">2</span>, <span class="number">4</span>) <span class="keyword">AS</span> x, x / <span class="number">3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toDecimal32(<span class="number">2</span>, <span class="number">4</span>) <span class="keyword">AS</span> x, </span><br><span class="line">    x / <span class="number">3</span></span><br><span class="line"></span><br><span class="line">┌──────x─┬─divide(toDecimal32(<span class="number">2</span>, <span class="number">4</span>), <span class="number">3</span>)─┐</span><br><span class="line">│ <span class="number">2.0000</span> │                       <span class="number">0.6666</span> │</span><br><span class="line">└────────┴──────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 整数部分溢出导致报错</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SELECT</span> toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, x * x</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, </span><br><span class="line">    x * x</span><br><span class="line"></span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">69.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: Scale <span class="number">16</span> <span class="keyword">is</span> <span class="keyword">out</span> <span class="keyword">of</span> bounds. </span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.005</span> sec. </span><br><span class="line"></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SELECT</span> toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, <span class="number">6</span> * x</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, </span><br><span class="line">    <span class="number">6</span> * x</span><br><span class="line"></span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">407.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: <span class="built_in">Decimal</span> math overflow. </span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 3. 关闭溢出检查</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SET</span> decimal_check_overflow = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SET</span> decimal_check_overflow = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.001</span> sec. </span><br><span class="line"></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SELECT</span> toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, <span class="number">6</span> * x</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>) <span class="keyword">AS</span> x, </span><br><span class="line">    <span class="number">6</span> * x</span><br><span class="line"></span><br><span class="line">┌──────────x─┬─multiply(<span class="number">6</span>, toDecimal32(<span class="number">4.2</span>, <span class="number">8</span>))─┐</span><br><span class="line">│ <span class="number">4.20000000</span> │                     <span class="number">-17.74967296</span> │</span><br><span class="line">└────────────┴──────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 4. 比较，溢出提示Can't compare</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">SELECT</span> toDecimal32(<span class="number">1</span>, <span class="number">8</span>) &lt; <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> toDecimal32(<span class="number">1</span>, <span class="number">8</span>) &lt; <span class="number">100</span></span><br><span class="line"></span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">407.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: Can<span class="string">'t compare. </span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">0 rows in set. Elapsed: 0.010 sec.</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2、字符串类型"><a href="#2、字符串类型" class="headerlink" title="2、字符串类型"></a>2、字符串类型</h3><p>字符串类型可分为String、FixedString和UUID类型。</p>
+<h4 id="2-1-String"><a href="#2-1-String" class="headerlink" title="2.1 String"></a>2.1 String</h4><p>字符串由String类型定义，无长度限制。在使用时也不需要声明大小，代替了其他数据库上的Varchar、Text、Blob等自负类型。而且String类型不限制字符集限制，可以写入任意编码的字符串，但为了标准统一化开发管理，官方建议一套程序中应使用统一的编码类型。</p>
+<h4 id="2-2-FixedString"><a href="#2-2-FixedString" class="headerlink" title="2.2 FixedString"></a>2.2 FixedString</h4><p>FixedString和传统的char类型类似，用来定义一些固定长度的字符串。通过<code>FixedString(N)</code>来定义声明，N表示字符串长度，当数据长度小于N字节时，会降低一定效率。但Char类型通常使用空格填充末尾字符，而FixedString用null字节来填充。</p>
+<ul>
+<li>当向ClickHouse中插入数据时<ul>
+<li>如果字符串包含字节数少于N，将用null字节来填充</li>
+<li>如果字符串包含字节数大于N，将抛出<code>Too large value for FixedString(N)</code>的异常</li>
+</ul>
+</li>
+<li>当查询数据时<ul>
+<li>ClickHouse不会删除字符串末尾的空字节，如果使用WHERE子句，则<strong>需要手动添加空字节来匹配FixedString的值</strong></li>
+</ul>
+</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 创建一个用来测试的表，并插入测试数据，若没有test库则需要create database test来进行创建</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">use</span> <span class="keyword">test</span></span><br><span class="line"></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">create</span> <span class="keyword">table</span> FixedStringTest ( a FixedString(<span class="number">2</span>) ) <span class="keyword">engine</span>=MergeTree <span class="keyword">order</span> <span class="keyword">by</span> a</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 插入正常数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">insert</span> <span class="keyword">into</span> FixedStringTest <span class="keyword">values</span> (<span class="string">'a'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 3. 插入大于N数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">insert</span> <span class="keyword">into</span> FixedStringTest <span class="keyword">values</span> (<span class="string">'abc'</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 4. 查询数据</span></span><br><span class="line"><span class="comment">-- where查询时并不会自动删除后面的null，所以无法得到想要的结果</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> FixedStringTest <span class="keyword">where</span> a = <span class="string">'a'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> FixedStringTest</span><br><span class="line"><span class="keyword">WHERE</span> a = <span class="string">'a'</span></span><br><span class="line"></span><br><span class="line">Ok.</span><br><span class="line"></span><br><span class="line"><span class="number">0</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询可看到，长度为2</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> a, <span class="keyword">length</span>(a) <span class="keyword">from</span> FixedStringTest</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    a, </span><br><span class="line">    <span class="keyword">length</span>(a)</span><br><span class="line"><span class="keyword">FROM</span> FixedStringTest</span><br><span class="line"></span><br><span class="line">┌─a─┬─<span class="keyword">length</span>(a)─┐</span><br><span class="line">│ a │         <span class="number">2</span> │</span><br><span class="line">└───┴───────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 需手动填充空字节用于where匹配</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> FixedStringTest <span class="keyword">where</span> a = <span class="string">'a\0'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> FixedStringTest</span><br><span class="line"><span class="keyword">WHERE</span> a = <span class="string">'a\0'</span></span><br><span class="line"></span><br><span class="line">┌─a─┐</span><br><span class="line">│ a │</span><br><span class="line">└───┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-UUID"><a href="#2-3-UUID" class="headerlink" title="2.3 UUID"></a>2.3 UUID</h4><p>UUID经常会在数据库中使用，有时候还会作为主键，ClickHouse直接将UUID作为了一种数据类型。UUID一共有32位，格式为<code>8-4-4-4-12</code>,如果UUID类型的字段在写入数据时没有被赋值，则会按照格式用0来填充。ClickHouse还提供了<code>generateUUIDv4</code>来生成随机的UUID。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 1. 创建测试表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_uuid (x <span class="keyword">UUID</span>, y <span class="keyword">String</span>) <span class="keyword">ENGINE</span>=TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 2. 插入UUID</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_uuid <span class="keyword">SELECT</span> generateUUIDv4(), <span class="string">'Example 1'</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 3. 查询</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> t_uuid</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> t_uuid</span><br><span class="line"></span><br><span class="line">┌────────────────────────────────────x─┬─y─────────┐</span><br><span class="line">│ a603876a<span class="number">-38</span>cb<span class="number">-460</span>a-bafb-a08d4ab1b9c4 │ Example <span class="number">1</span> │</span><br><span class="line">└──────────────────────────────────────┴───────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">1</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 4. 不指定UUID插入数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_uuid (y) <span class="keyword">VALUES</span> (<span class="string">'Example 2'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询结果</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> t_uuid</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> t_uuid</span><br><span class="line"></span><br><span class="line">┌────────────────────────────────────x─┬─y─────────┐</span><br><span class="line">│ a603876a<span class="number">-38</span>cb<span class="number">-460</span>a-bafb-a08d4ab1b9c4 │ Example <span class="number">1</span> │</span><br><span class="line">│ <span class="number">00000000</span><span class="number">-0000</span><span class="number">-0000</span><span class="number">-0000</span><span class="number">-000000000000</span> │ Example <span class="number">2</span> │</span><br><span class="line">└──────────────────────────────────────┴───────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、时间类型"><a href="#3、时间类型" class="headerlink" title="3、时间类型"></a>3、时间类型</h3><p>时间类型分为DateTime、DateTime64和Date三种。ClickHouse目前不存在时间戳类型，时间类型的最高精度到秒，所以若需要毫秒、微秒等时间，只能用UInt类型实现</p>
+<h4 id="3-1-DateTime"><a href="#3-1-DateTime" class="headerlink" title="3.1 DateTime"></a>3.1 DateTime</h4><p>DateTime类型精确到秒，可表示的时间范围为<code>[&#39;1970-01-01 00:00:00&#39;, &#39;2105-12-31 23:59:59&#39;]</code>，创建表时，可以为DateTime的列显示设置失去，如果未为表设置失去，启动ClickHouse服务时，它将使用系统设置中的timezone参数，也可以使用<code>--use_client_time_zone</code>参数来启动clickhouse-client，默认格式为<code>YYYY-MM-DD hh:mm:ss</code>输出至，也可以使用<code>formatDateTime</code>函数来更改输出，插入数据时格式则取决于<code>date_time_input_format</code>的设置。</p>
+<p><strong>1. 创建设置了DateTime类型列的表并插入数据</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dt ( <span class="string">`timestamp`</span> DateTime(<span class="string">'Asia/Shanghai'</span>), <span class="string">`event_id`</span> UInt8 ) <span class="keyword">ENGINE</span> = TinyLog;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> dt <span class="keyword">Values</span> (<span class="number">1546300800</span>, <span class="number">1</span>), (<span class="string">'2020-07-12 00:00:00'</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询数据</span></span><br><span class="line">clickhouse-server_1 :) <span class="keyword">select</span> * <span class="keyword">from</span> dt;</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> *</span><br><span class="line"><span class="keyword">FROM</span> dt</span><br><span class="line"></span><br><span class="line">┌───────────<span class="built_in">timestamp</span>─┬─event_id─┐</span><br><span class="line">│ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> <span class="number">08</span>:<span class="number">00</span>:<span class="number">00</span> │        <span class="number">1</span> │</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-12</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> │        <span class="number">2</span> │</span><br><span class="line">└─────────────────────┴──────────┘</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> <span class="keyword">rows</span> <span class="keyword">in</span> set. Elapsed: <span class="number">0.002</span> sec.</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>将datetime插入为整数时，它会被视为Unix时间戳(UTC)，1546300800表示’2019-01-01 00:00:00’UTC，但由于timestamp列已指定了时区<code>Asia/Shanghai</code>，所以会显示为东八区时间<code>2019-01-01 08:00:00</code></li>
+</ul>
+<p><strong>2. 指定时区删选DateTime值</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> dt <span class="keyword">WHERE</span> <span class="built_in">timestamp</span> = toDateTime(<span class="string">'2020-07-12 00:00:00'</span>, <span class="string">'Asia/Shanghai'</span>)</span><br><span class="line"><span class="comment">-- 结果为</span></span><br><span class="line">┌───────────<span class="built_in">timestamp</span>─┬─event_id─┐</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-12</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> │        <span class="number">2</span> │</span><br><span class="line">└─────────────────────┴──────────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 也可通过where字符串值过滤</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> dt <span class="keyword">WHERE</span> <span class="built_in">timestamp</span> = <span class="string">'2020-07-12 00:00:00'</span></span><br><span class="line">┌───────────<span class="built_in">timestamp</span>─┬─event_id─┐</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-12</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> │        <span class="number">2</span> │</span><br><span class="line">└─────────────────────┴──────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>3. 获取DateTime列和时区类型</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> toDateTime(<span class="keyword">now</span>(), <span class="string">'Asia/Shanghai'</span>) <span class="keyword">AS</span> <span class="keyword">column</span>, toTypeName(<span class="keyword">column</span>) <span class="keyword">AS</span> x</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌──────────────<span class="keyword">column</span>─┬─x─────────────────────────┐</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-12</span> <span class="number">12</span>:<span class="number">41</span>:<span class="number">28</span> │ DateTime(<span class="string">'Asia/Shanghai'</span>) │</span><br><span class="line">└─────────────────────┴───────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>4. 转换列时区</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> toDateTime(<span class="built_in">timestamp</span>, <span class="string">'Europe/London'</span>) <span class="keyword">as</span> lon_time, toDateTime(<span class="built_in">timestamp</span>, <span class="string">'Europe/Moscow'</span>) <span class="keyword">as</span> mos_time <span class="keyword">FROM</span> dt</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌────────────lon_time─┬────────────mos_time─┐</span><br><span class="line">│ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00</span> │ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> <span class="number">03</span>:<span class="number">00</span>:<span class="number">00</span> │</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-11</span> <span class="number">17</span>:<span class="number">00</span>:<span class="number">00</span> │ <span class="number">2020</span><span class="number">-07</span><span class="number">-11</span> <span class="number">19</span>:<span class="number">00</span>:<span class="number">00</span> │</span><br><span class="line">└─────────────────────┴─────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-DateTime64"><a href="#3-2-DateTime64" class="headerlink" title="3.2 DateTime64"></a>3.2 DateTime64</h4><p>DateTime64在DateTime类型基础上增加了精度设置，可以记录到亚秒，其余使用方法和DateTime相同。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> dt64 (<span class="string">`timestamp`</span> DateTime64(<span class="number">3</span>, <span class="string">'Asia/Shanghai'</span>), <span class="string">`event_id`</span> UInt8 ) <span class="keyword">ENGINE</span> = TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入测试数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> dt64 <span class="keyword">Values</span> (<span class="number">1546300800000</span>, <span class="number">1</span>), (<span class="string">'2019-01-01 00:00:00'</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询结果</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> dt64</span><br><span class="line"><span class="comment">-- 结果为</span></span><br><span class="line">┌───────────────<span class="built_in">timestamp</span>─┬─event_id─┐</span><br><span class="line">│ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> <span class="number">08</span>:<span class="number">00</span>:<span class="number">00.000</span> │        <span class="number">1</span> │</span><br><span class="line">│ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> <span class="number">00</span>:<span class="number">00</span>:<span class="number">00.000</span> │        <span class="number">2</span> │</span><br><span class="line">└─────────────────────────┴──────────┘</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-Date"><a href="#3-3-Date" class="headerlink" title="3.3 Date"></a>3.3 Date</h4><p>Date类型不包含具体的时间，只精确到天，存储的日期值不带时区，同样支持字符串的形式写入。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> date_test(<span class="string">`c1`</span> <span class="built_in">Date</span>, <span class="string">`event_id`</span> UInt8 ) <span class="keyword">Engine</span> = TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据，即使插入包含具体时间的值，也只会写入日期</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> date_test <span class="keyword">values</span> (<span class="string">'2019-01-01 00:00:00'</span>, <span class="number">1</span>), (<span class="string">'2020-07-12'</span>, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> date_test</span><br><span class="line"><span class="comment">-- 结果为</span></span><br><span class="line">┌─────────c1─┬─event_id─┐</span><br><span class="line">│ <span class="number">2019</span><span class="number">-01</span><span class="number">-01</span> │        <span class="number">1</span> │</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-12</span> │        <span class="number">2</span> │</span><br><span class="line">└────────────┴──────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、复合类型"><a href="#三、复合类型" class="headerlink" title="三、复合类型"></a>三、复合类型</h2><p>除了数值、字符串和时间这些基础数据类型之外，ClickHouse还提供了数组、元组、枚举和嵌套四种复合类型。</p>
+<h3 id="1、数组Array"><a href="#1、数组Array" class="headerlink" title="1、数组Array"></a>1、数组Array</h3><p>数组有两种定义形式：array(T)和[]</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">array</span>(<span class="number">1</span>, <span class="number">2</span>) <span class="keyword">as</span> a, toTypeName(a)</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌─a─────┬─toTypeName([<span class="number">1</span>, <span class="number">2</span>])─┐</span><br><span class="line">│ [<span class="number">1</span>,<span class="number">2</span>] │ <span class="built_in">Array</span>(UInt8)       │</span><br><span class="line">└───────┴────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="keyword">select</span> [<span class="number">1</span>,<span class="number">2</span>] <span class="keyword">as</span> a, toTypeName(a)</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌─a─────┬─toTypeName([<span class="number">1</span>, <span class="number">2</span>])─┐</span><br><span class="line">│ [<span class="number">1</span>,<span class="number">2</span>] │ <span class="built_in">Array</span>(UInt8)       │</span><br><span class="line">└───────┴────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>可以看出，在查询时并不需要主动声明数组的元素类型，这是因为ClickHouse的数组拥有类型推断的能力。但在快速创建数组时，ClickHouse会自动将参数定义为最小的可表达的数据类型。例如若数组中存在NULL值，数组元素类型会变为Nullable。<strong>但在进行表定义时，数组需要指定明确的元素类型</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="built_in">array</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="literal">NULL</span>) <span class="keyword">AS</span> x, toTypeName(x)</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌─x──────────┬─toTypeName([<span class="number">1</span>, <span class="number">2</span>, <span class="literal">NULL</span>])─┐</span><br><span class="line">│ [<span class="number">1</span>,<span class="number">2</span>,<span class="literal">NULL</span>] │ <span class="built_in">Array</span>(Nullable(UInt8))   │</span><br><span class="line">└────────────┴──────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 建表时需要指定类型</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> array_test(c1 <span class="built_in">Array</span>(<span class="keyword">String</span>)) <span class="keyword">engine</span> = TinyLog     <span class="comment">## 可创建成功，数据写入过程中会进行类型检查</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> array_test(c1 <span class="built_in">Array</span>) <span class="keyword">engine</span> = TinyLog     <span class="comment">## 会创建失败</span></span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">42.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: <span class="built_in">Array</span> <span class="keyword">data</span> <span class="keyword">type</span> family must have exactly one argument - <span class="keyword">type</span> <span class="keyword">of</span> elements.</span><br></pre></td></tr></table></figure>
+
+<p>当一个数组内包含了多种数据类型，则ClickHouse会引发异常。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="built_in">array</span>(<span class="number">1</span>, <span class="string">'a'</span>)</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">386.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: There <span class="keyword">is</span> <span class="keyword">no</span> supertype <span class="keyword">for</span> types UInt8, <span class="keyword">String</span> because <span class="keyword">some</span> <span class="keyword">of</span> them <span class="keyword">are</span> <span class="keyword">String</span>/FixedString <span class="keyword">and</span> <span class="keyword">some</span> <span class="keyword">of</span> them <span class="keyword">are</span> not.</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、元组Tuple"><a href="#2、元组Tuple" class="headerlink" title="2、元组Tuple"></a>2、元组Tuple</h3><p>元组类型有1～n个元素组成，每个元素都是一个单独的类型。与数组类似，元组也可用两种方式定义：tuple(T)或(t1, t2, …)</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> tuple(<span class="number">1</span>,<span class="string">'a'</span>) <span class="keyword">AS</span> x, toTypeName(x)</span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line">┌─x───────┬─toTypeName(tuple(<span class="number">1</span>, <span class="string">'a'</span>))─┐</span><br><span class="line">│ (<span class="number">1</span>,<span class="string">'a'</span>) │ Tuple(UInt8, <span class="keyword">String</span>)      │</span><br><span class="line">└─────────┴───────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> tuple(<span class="number">1</span>, <span class="literal">NULL</span>) <span class="keyword">AS</span> x, toTypeName(x)</span><br><span class="line">┌─x────────┬─toTypeName(tuple(<span class="number">1</span>, <span class="literal">NULL</span>))──────┐</span><br><span class="line">│ (<span class="number">1</span>,<span class="literal">NULL</span>) │ Tuple(UInt8, Nullable(<span class="keyword">Nothing</span>)) │</span><br><span class="line">└──────────┴─────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>定义表字段时，同样需要指定明确的元素类型</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> tuple_test ( c1 Tuple(<span class="keyword">String</span>, <span class="built_in">Int8</span>)) <span class="keyword">Engine</span> = TinyLog</span><br><span class="line"><span class="comment">-- 插入数据时也会进行类型检查</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tuple_test <span class="keyword">values</span>((<span class="string">'abc'</span>, <span class="number">123</span>))    <span class="comment">## 可插入成功</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> tuple_test <span class="keyword">values</span>((<span class="string">'abc'</span>, <span class="string">'def'</span>))	<span class="comment">## 会提示类型报错</span></span><br><span class="line"><span class="comment">-- 结果</span></span><br><span class="line"><span class="keyword">Exception</span> <span class="keyword">on</span> <span class="keyword">client</span>:</span><br><span class="line">Code: <span class="number">6.</span> DB::<span class="keyword">Exception</span>: Cannot <span class="keyword">parse</span> <span class="keyword">string</span> <span class="string">'def'</span> <span class="keyword">as</span> <span class="built_in">Int8</span>: syntax <span class="keyword">error</span> <span class="keyword">at</span> <span class="keyword">begin</span> <span class="keyword">of</span> string. Note: there <span class="keyword">are</span> toInt8OrZero <span class="keyword">and</span> toInt8OrNull functions, which <span class="keyword">returns</span> zero/<span class="literal">NULL</span> instead <span class="keyword">of</span> throwing exception.</span><br></pre></td></tr></table></figure>
+
+<h3 id="3、枚举Enum"><a href="#3、枚举Enum" class="headerlink" title="3、枚举Enum"></a>3、枚举Enum</h3><p>ClickHouse提供了Enum8和Enum16两种枚举类型，ClickHouse可自动选择Enum插入数据的类型，也可以手动指定。他们仅取值范围不同：</p>
+<ul>
+<li>Enum8包含[-128, 127]范围内列举的256个值-</li>
+<li>Enum16最多包含[-32768, 32767]范围内列举的65536个值</li>
+</ul>
+<p>命名值必须声明为<code>&#39;string: Int&#39;的Key/Value</code>键值对形式，所以Enum8和Enum16分别为<code>(String: Int8)</code>和<code>(String: Int16)</code>.</p>
+<p>在使用枚举类型时，有以下限制：</p>
+<ul>
+<li>Key和Value不允许重复，需保证唯一性</li>
+<li>Key和Value值都不能为Null，但Key允许是空字符串</li>
+</ul>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_enum (x Enum(<span class="string">'hello'</span> = <span class="number">1</span>, <span class="string">'world'</span> = <span class="number">2</span>)) <span class="keyword">ENGINE</span> = TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_enum <span class="keyword">VALUES</span> (<span class="string">'hello'</span>), (<span class="string">'world'</span>), (<span class="string">'hello'</span>)</span><br><span class="line"><span class="comment">-- 插入成功</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 若插入enum之外的key，则会抛出异常</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_enum <span class="keyword">values</span>(<span class="string">'a'</span>)</span><br><span class="line"><span class="comment">-- 结果：</span></span><br><span class="line"><span class="keyword">Exception</span> <span class="keyword">on</span> <span class="keyword">client</span>:</span><br><span class="line">Code: <span class="number">36.</span> DB::<span class="keyword">Exception</span>: <span class="literal">Unknown</span> <span class="keyword">element</span> <span class="string">'a'</span> <span class="keyword">for</span> <span class="keyword">type</span> Enum8(<span class="string">'hello'</span> = <span class="number">1</span>, <span class="string">'world'</span> = <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询数据，会输出字符串类型的Key值</span></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> t_enum</span><br><span class="line">┌─x─────┐</span><br><span class="line">│ hello │</span><br><span class="line">│ world │</span><br><span class="line">│ hello │</span><br><span class="line">└───────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 若需要查看对应的value值，则需要将Enum值转换为整数类型，CAST(x, T)则将x类型转换为T类型</span></span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">CAST</span>(x, <span class="string">'Int8'</span>) <span class="keyword">FROM</span> t_enum</span><br><span class="line">┌─<span class="keyword">CAST</span>(x, <span class="string">'Int8'</span>)─┐</span><br><span class="line">│               <span class="number">1</span> │</span><br><span class="line">│               <span class="number">2</span> │</span><br><span class="line">│               <span class="number">1</span> │</span><br><span class="line">└─────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 若在select中直接创建Enum类型，仍然需要CAST函数转换</span></span><br><span class="line"><span class="keyword">SELECT</span> toTypeName(<span class="keyword">CAST</span>(<span class="string">'hello'</span>, <span class="string">'Enum(\'</span>hello\<span class="string">' = 1, \'</span>world\<span class="string">' = 2)'</span>))</span><br><span class="line">┌─toTypeName(<span class="keyword">CAST</span>(<span class="string">'hello'</span>, <span class="string">'Enum(\'</span>hello\<span class="string">' = 1, \'</span>world\<span class="string">' = 2)'</span>))─┐</span><br><span class="line">│ Enum8(<span class="string">'hello'</span> = <span class="number">1</span>, <span class="string">'world'</span> = <span class="number">2</span>)                                 │</span><br><span class="line">└─────────────────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="4、嵌套Nested"><a href="#4、嵌套Nested" class="headerlink" title="4、嵌套Nested"></a>4、嵌套Nested</h3><p>一个数据表可以定义任意多个嵌套类型字段，但每个字段只能有一层潜逃，即嵌套字段内不能继续使用嵌套类型。ClickHouse的嵌套类型本质是一个多维数组的结构，即嵌套表中的每个字段都是一个数组。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">create</span> <span class="keyword">table</span> nested_test(<span class="keyword">name</span> <span class="keyword">String</span>, age UInt8, dept <span class="keyword">Nested</span>(<span class="keyword">id</span> UInt8, <span class="keyword">name</span> <span class="keyword">String</span>)) <span class="keyword">Engine</span> = TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nested_test <span class="keyword">values</span> (<span class="string">'alice'</span>, <span class="number">18</span>, [<span class="number">10000</span>, <span class="number">10001</span>], [<span class="string">'aaa'</span>, <span class="string">'bbb'</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据时，同一行数据中嵌套类型的数组字段长度必须相同，否则会抛出以下异常</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> nested_test <span class="keyword">values</span> (<span class="string">'bob'</span>, <span class="number">22</span>, [<span class="number">10000</span>], [<span class="string">'aaa'</span>, <span class="string">'bbb'</span>])</span><br><span class="line">Received <span class="keyword">exception</span> <span class="keyword">from</span> <span class="keyword">server</span> (<span class="keyword">version</span> <span class="number">20.3</span><span class="number">.4</span>):</span><br><span class="line">Code: <span class="number">190.</span> DB::<span class="keyword">Exception</span>: Received <span class="keyword">from</span> localhost:<span class="number">9000.</span> DB::<span class="keyword">Exception</span>: Elements <span class="string">'dept.id'</span> <span class="keyword">and</span> <span class="string">'dept.name'</span> <span class="keyword">of</span> <span class="keyword">Nested</span> <span class="keyword">data</span> structure <span class="string">'dept'</span> (<span class="built_in">Array</span> <span class="keyword">columns</span>) have different <span class="built_in">array</span> sizes.. </span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询数据</span></span><br><span class="line"><span class="keyword">select</span> <span class="keyword">name</span>, dept.id, dept.name <span class="keyword">from</span> nested_test;</span><br><span class="line">┌─name──┬─dept.id─┬─dept.name─────┐</span><br><span class="line">│ alice │ [16,17] │ ['aaa','bbb'] │</span><br><span class="line">└───────┴─────────┴───────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、其他类型"><a href="#四、其他类型" class="headerlink" title="四、其他类型"></a>四、其他类型</h2><p>​    ClickHouse除了上述类型之外，还定义了一些其他字段类型作为对基础数据的进一步修饰和封装。</p>
+<h3 id="1、Nullable"><a href="#1、Nullable" class="headerlink" title="1、Nullable"></a>1、Nullable</h3><p>​    Nullable并不能算一种独立的数据类型，它需要和基础数据类型配合使用，并不能用于数组和元组这些复合类型，通过Nullable修饰之后，该基础类型字段可以输入Null值。</p>
+<p>​    使用了Nullable修饰后，该字段不能作为索引字段，并且会使查询和写入性能变慢。这是由于一般情况下每个字段的数据会存储在对应的column.bin文件中，如果该字段被Nullable修饰，会额外生成column.null.bin文件专门保存null值，这表示读取和写入，需要一倍的额外文件操作。故官方并不建议经常使用Nullable类型</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> t_null(x <span class="built_in">Int8</span>, y Nullable(<span class="built_in">Int8</span>)) <span class="keyword">ENGINE</span> TinyLog</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> t_null <span class="keyword">VALUES</span> (<span class="number">1</span>, <span class="literal">NULL</span>), (<span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> t_null</span><br><span class="line">┌─x─┬────y─┐</span><br><span class="line">│ <span class="number">1</span> │ ᴺᵁᴸᴸ │</span><br><span class="line">│ <span class="number">2</span> │    <span class="number">3</span> │</span><br><span class="line">└───┴──────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="2、Domain"><a href="#2、Domain" class="headerlink" title="2、Domain"></a>2、Domain</h3><p>Domain类型分为IPv4和IPv6两种，本质是对整型和字符串型的进一步封装，虽然Domain类型看起来和String类型相同，但它并不是字符串类型，不支持隐式的自动类型转换，如果需要返回IP的字符串形式，需要调用<code>IPv4NumToString</code>或<code>IPv6NumToString</code>函数进行转换。IPv4类型是基于UInt32封装，IPv6基于FixedString(16)封装。他们使用方式相同，以下用IPv4作为示例。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建测试表</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> hits (<span class="keyword">url</span> <span class="keyword">String</span>, <span class="keyword">from</span> IPv4) <span class="keyword">ENGINE</span> = MergeTree() <span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">url</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 插入数据</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> hits <span class="keyword">values</span>(<span class="string">'www.zzdb.com'</span>, <span class="string">'1.1.1.1'</span>),(<span class="string">'test.db.com'</span>, <span class="string">'2.2.2.2'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">-- Domain格式会进行数据类型检查</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> hits <span class="keyword">values</span> (<span class="string">'www.test.com'</span>, <span class="string">'192.168.1'</span>)</span><br><span class="line"><span class="keyword">Exception</span> <span class="keyword">on</span> <span class="keyword">client</span>:</span><br><span class="line">Code: <span class="number">441.</span> DB::<span class="keyword">Exception</span>: Invalid IPv4 value.</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询数据</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> hits</span><br><span class="line">┌─<span class="keyword">url</span>──────────┬────<span class="keyword">from</span>─┐</span><br><span class="line">│ test.db.com  │ <span class="number">2.2</span><span class="number">.2</span><span class="number">.2</span> │</span><br><span class="line">│ www.zzdb.com │ <span class="number">1.1</span><span class="number">.1</span><span class="number">.1</span> │</span><br><span class="line">└──────────────┴─────────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 转换为字符串类型</span></span><br><span class="line"><span class="keyword">SELECT</span> toTypeName(s), IPv4NumToString(<span class="keyword">from</span>) <span class="keyword">as</span> s <span class="keyword">FROM</span> hits <span class="keyword">LIMIT</span> <span class="number">1</span>;</span><br><span class="line">┌─toTypeName(IPv4NumToString(from))─┬─s───────┐</span><br><span class="line">│ String                            │ 2.2.2.2 │</span><br><span class="line">└───────────────────────────────────┴─────────┘</span><br></pre></td></tr></table></figure>
+
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        <li>
+            <a target="_blank" href="https://twitter.com/li618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-twitter"></i>
+                            </span>
+            </a>
+        </li>
+        
+        
+        <li>
+            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
+                            <span class="fa-stack fa-lg">
+                                 <i class="iconfont icon-zhihu"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+        
+
+        
+        <li>
+            <a target="_blank"  href="https://github.com/schnappi618">
+                            <span class="fa-stack fa-lg">
+                                <i class="iconfont icon-github"></i>
+                            </span>
+            </a>
+        </li>
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
+        <span>/</span>
+        
+        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
+        <span>/</span>
+        
+        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer><!-- hexo-inject:begin --><!-- Begin: Injected MathJax -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({"tex2jax":{"inlineMath":[["$","$"],["\\(","\\)"]],"skipTags":["script","noscript","style","textarea","pre","code"],"processEscapes":true},"TeX":{"equationNumbers":{"autoNumber":"AMS"}}});
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js">
+</script>
+<!-- End: Injected MathJax -->
+<!-- hexo-inject:end -->
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+<script src="/js/index.js"></script>
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+</html>
