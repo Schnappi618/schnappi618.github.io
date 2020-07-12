@@ -1,0 +1,105 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 625 479" height="479" xmlns:xlink="http://www.w3.org/1999/xlink" width="625">
+    <style type="text/css"><![CDATA[
+.st3 {fill:#191919;font-family:微软雅黑;font-size:13.5pt}
+.st2 {fill:#191919;font-family:微软雅黑;font-size:18pt}
+.st1 {fill:#191919;font-family:微软雅黑;font-size:7.5pt}
+]]></style>
+    <defs/>
+    <g transform="translate(-248.76,-157.35)">
+        <path fill="#ffffff" stroke="#323232" d="M0,0L585,0L585,179L0,179L0,0z" id="shape1" transform="translate(287.76,191.35)" fill-rule="evenodd"/>
+        <path fill="#ffffff" stroke="#323232" d="M0,0L251,0L251,95L0,95L0,0z" id="shape2" transform="translate(596.26,247.35)" fill-rule="evenodd"/>
+        <path fill="#ffffff" stroke="#323232" d="M0,0L251,0L251,95L0,95L0,0z" id="shape3" transform="translate(310.76,247.35)" fill-rule="evenodd"/>
+        <g id="shape4" transform="translate(331.76,263.35)">
+            <path fill="#ffffff" stroke="#323232" d="M100,60L100,0L0,0L0,60L100,60z" fill-rule="evenodd"/>
+            <text class="st1">
+                <tspan x="35" y="34">头文件</tspan>
+            </text>
+        </g>
+        <g id="shape5" transform="translate(432.76,263.35)">
+            <path fill="#ffffff" stroke="#323232" d="M100,60L100,0L0,0L0,60L100,60z" fill-rule="evenodd"/>
+            <text class="st1">
+                <tspan x="30" y="34">压缩数据</tspan>
+            </text>
+        </g>
+        <g id="shape6" transform="translate(621.76,263.35)">
+            <path fill="#ffffff" stroke="#323232" d="M100,60L100,0L0,0L0,60L100,60z" fill-rule="evenodd"/>
+            <text class="st1">
+                <tspan x="35" y="34">头文件</tspan>
+            </text>
+        </g>
+        <g id="shape7" transform="translate(721.76,263.35)">
+            <path fill="#ffffff" stroke="#323232" d="M100,60L100,0L0,0L0,60L100,60z" fill-rule="evenodd"/>
+            <text class="st1">
+                <tspan x="30" y="34">压缩数据</tspan>
+            </text>
+        </g>
+        <g id="shape8" transform="translate(362.76,200.35)">
+            <text class="st1">
+                <tspan x="38" y="21.5">压缩数据块0</tspan>
+                <tspan x="5" y="33.5">head stat:(65536, 12000)</tspan>
+            </text>
+        </g>
+        <g id="shape9" transform="translate(655.26,200.35)">
+            <text class="st1">
+                <tspan x="38" y="21.5">压缩数据块1</tspan>
+                <tspan x="5" y="33.5">head stat:(65536, 14660)</tspan>
+            </text>
+        </g>
+        <path fill="#ffffff" stroke="#323232" d="M32.1,0L32.1,64.4L51,59.3L25.5,95L0,59.3L18.9,64.4L18.9,0L32.1,0" id="shape10" transform="translate(356.26,323.35)" fill-rule="evenodd"/>
+        <g id="shape11" transform="translate(268.76,407.35)">
+            <text class="st2">
+                <tspan x="41" y="42">0x821200065536</tspan>
+            </text>
+        </g>
+        <path stroke="#323232" fill="none" d="M0,0L4.8,0C6.1,-0.2,7.4,.3,8.3,1.2C9.2,2.1,9.7,3.4,9.5,4.8L9.5,23.7C9.3,25,9.8,26.3,10.7,27.3C11.6,28.2,12.9,28.6,14.2,28.5C12.9,28.3,11.6,28.7,10.7,29.6C9.8,30.6,9.3,31.9,9.5,33.2L9.5,52.2C9.7,53.5,9.2,54.8,8.3,55.7C7.4,56.7,6.1,57.1,4.7,56.9L0,56.9" id="shape12" transform="matrix(0,1,1,0,310.8,460.1)"/>
+        <g id="shape13" transform="translate(350.76,469.6)">
+            <path stroke="#323232" fill="none" d=""/>
+        </g>
+        <path stroke="#323232" fill="none" d="M0,0L4.8,0C6.1,-0.2,7.4,.3,8.3,1.2C9.2,2.1,9.7,3.4,9.5,4.8L9.5,27.2C9.3,28.5,9.8,29.9,10.7,30.8C11.6,31.7,12.9,32.2,14.2,32C12.9,31.8,11.6,32.2,10.7,33.2C9.8,34.1,9.3,35.4,9.5,36.7L9.5,59.2C9.7,60.5,9.2,61.8,8.3,62.8C7.4,63.7,6.1,64.1,4.8,64L0,64" id="shape14" transform="matrix(0,1,1,0,374.8,460.1)"/>
+        <path stroke="#323232" fill="none" d="M0,0L4.8,0C6.1,-0.2,7.4,.3,8.3,1.2C9.2,2.1,9.7,3.4,9.5,4.8L9.5,27.2C9.3,28.5,9.8,29.9,10.7,30.8C11.6,31.7,12.9,32.2,14.2,32C12.9,31.8,11.6,32.2,10.7,33.2C9.8,34.1,9.3,35.4,9.5,36.7L9.5,59.2C9.7,60.5,9.2,61.8,8.3,62.8C7.4,63.7,6.1,64.1,4.8,64L0,64" id="shape15" transform="matrix(0,1,1,0,450.8,460.1)"/>
+        <g id="shape16" transform="translate(268.76,512.35)">
+            <text class="st3">
+                <tspan x="12" y="25">CompressionMethod_CompressedSize_UncompressedSize</tspan>
+            </text>
+        </g>
+        <g id="shape17" transform="translate(391.76,522.35)">
+            <path stroke="#323232" fill="none" d="M0,0L-39.9,-39.9"/>
+            <path stroke-width="1" fill="#323232" stroke="#323232" stroke-linecap="round" d="M-43,-43L-41.4,-37.2C-41.2,-38.2,-40.7,-39.1,-39.9,-39.9C-39.1,-40.7,-38.2,-41.2,-37.2,-41.4L-43,-43"/>
+        </g>
+        <g id="shape18" transform="translate(513.76,521.35)">
+            <path stroke="#323232" fill="none" d="M0,0L-90,-40.2"/>
+            <path stroke-width="1" fill="#323232" stroke="#323232" stroke-linecap="round" d="M-94,-42L-90.5,-37.1C-90.6,-38.2,-90.4,-39.2,-90,-40.2C-89.5,-41.2,-88.9,-42,-88,-42.6L-94,-42"/>
+        </g>
+        <g id="shape19" transform="translate(679.76,521.35)">
+            <path stroke="#323232" fill="none" d="M0,0L-179.7,-44.9"/>
+            <path stroke-width="1" fill="#323232" stroke="#323232" stroke-linecap="round" d="M-184,-46L-179.7,-41.8C-180,-42.8,-180,-43.9,-179.7,-44.9C-179.5,-46,-178.9,-46.9,-178.2,-47.7L-184,-46"/>
+        </g>
+        <g id="shape20" transform="translate(287.76,531.35)">
+            <text class="st1">
+                <tspan x="70" y="26">压缩方法</tspan>
+                <tspan x="31" y="38">Type: UInt8, Size: 1 Byte</tspan>
+                <tspan x="65" y="50">LZ4: 0x82</tspan>
+                <tspan x="61" y="62">ZSTD: 0x90</tspan>
+                <tspan x="54" y="74">Multiple: 0x91</tspan>
+                <tspan x="61" y="86">Delta: 0x92</tspan>
+            </text>
+        </g>
+        <g id="shape21" transform="translate(476.76,544.85)">
+            <text class="st1">
+                <tspan x="24" y="26.5">数据压缩后字节大小</tspan>
+                <tspan x="7" y="38.5">Type: UInt32, Size: 4 Byte</tspan>
+            </text>
+        </g>
+        <g id="shape22" transform="translate(641.76,544.85)">
+            <text class="st1">
+                <tspan x="24" y="26.5">数据压缩前字节大小</tspan>
+                <tspan x="7" y="38.5">Type: UInt32, Size: 4 Byte</tspan>
+            </text>
+        </g>
+        <g id="shape23" transform="translate(249.76,158.35)">
+            <text class="st1">
+                <tspan x="32" y="19.5">column.bin</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
