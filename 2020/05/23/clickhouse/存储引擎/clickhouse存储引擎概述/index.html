@@ -93,7 +93,7 @@
     </div>
     
         <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse引擎的作用"><span class="toc-text">一、ClickHouse引擎的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、ClickHouse表引擎分类"><span class="toc-text">二、ClickHouse表引擎分类</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、ClickHouse引擎的作用"><span class="toc-text">一、ClickHouse引擎的作用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、ClickHouse库引擎分类"><span class="toc-text">二、ClickHouse库引擎分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、ClickHouse表引擎分类"><span class="toc-text">三、ClickHouse表引擎分类</span></a></li></ol>
 </div>
     
 </div>
@@ -146,7 +146,7 @@
     </div>
     <div class="post-content ">
         <p>本篇内容参考：<a href="https://clickhouse.tech/docs/zh/engines/table-engines/" target="_blank" rel="noopener">clickhouse官方文档</a></p>
-<h2 id="一、ClickHouse引擎的作用"><a href="#一、ClickHouse引擎的作用" class="headerlink" title="一、ClickHouse引擎的作用"></a>一、ClickHouse引擎的作用</h2><p>​    clickhouse表引擎的作用基本如下：</p>
+<h2 id="一、ClickHouse引擎的作用"><a href="#一、ClickHouse引擎的作用" class="headerlink" title="一、ClickHouse引擎的作用"></a>一、ClickHouse引擎的作用</h2><p>​    ClickHouse引擎可分为库引擎和表引擎。ClickHouse引擎的作用基本如下：</p>
 <ul>
 <li>数据的存储方式和位置：例如log系列引擎将数据写入在磁盘上，而Special系列的引擎将数据写入在内存上，但Distributed引擎并不存储书籍，仅作为中间件转发</li>
 <li>支持的哪些查询方式：例如log系列引擎不支持update和delete操作</li>
@@ -154,7 +154,15 @@
 <li>是否可以使用索引：例如log系列引擎并不支持使用索引</li>
 <li>数据如何进行复制：不同的存储引擎进行数据复制的参数完全不同</li>
 </ul>
-<h2 id="二、ClickHouse表引擎分类"><a href="#二、ClickHouse表引擎分类" class="headerlink" title="二、ClickHouse表引擎分类"></a>二、ClickHouse表引擎分类</h2><p>​    ClickHouse提供了大概27种适用于不同情况的表引擎，其中整体大概分为4类，分类大致如下图所示：</p>
+<h2 id="二、ClickHouse库引擎分类"><a href="#二、ClickHouse库引擎分类" class="headerlink" title="二、ClickHouse库引擎分类"></a>二、ClickHouse库引擎分类</h2><p>ClickHouse目前支持5种库引擎：</p>
+<ul>
+<li>Ordinary：默认引擎。在该引擎下可以使用任何类型的表引擎</li>
+<li>Dictionary：字典引擎。这种引擎的数据库会自动为所有的数据字典创建它们的数据表</li>
+<li>Memory：内存引擎。用于存放临时数据，这种引擎的数据库下的表只会停留在内存中，不涉及任何磁盘操作，服务重启后数据会被清除</li>
+<li>Lazy：日志引擎。该类数据库只能只用Log系列的表引擎</li>
+<li>MySQL引擎。该类数据库会自动拉取远端MySQL中的数据，并创建MySQL表引擎的数据表。</li>
+</ul>
+<h2 id="三、ClickHouse表引擎分类"><a href="#三、ClickHouse表引擎分类" class="headerlink" title="三、ClickHouse表引擎分类"></a>三、ClickHouse表引擎分类</h2><p>​    ClickHouse提供了大概27种适用于不同情况的表引擎，其中整体大概分为4类，分类大致如下图所示：</p>
 <img src="/2020/05/23/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/clickhouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E6%A6%82%E8%BF%B0/%E8%A1%A8%E5%BC%95%E6%93%8E.jpeg" style="zoom:30%;">
 
 <p>​    ClickHouse主要将表引擎分为了四类：</p>
