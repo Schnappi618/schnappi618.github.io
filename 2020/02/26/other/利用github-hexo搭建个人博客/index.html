@@ -1,148 +1,138 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="schnappi_xxn">
-    <meta name="keyword"  content="">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-
+    
     <title>
-        
-        利用github+hexo搭建个人博客 - Schnappi618的博客 | schnappi618&#39;s Blog
-        
+        利用github+hexo搭建个人博客 | schnappi blog
     </title>
-
-    <!-- Custom CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-<link rel="stylesheet" href="/css/aircloud.css">
-
+        <link rel="shortcut icon" href="/images/favicon.png">
     
-<link rel="stylesheet" href="/css/gitment.css">
+    
+<link rel="stylesheet" href="/css/style.css">
 
-    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
-    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
-    <!-- ga & ba script hoook -->
-    <script></script>
-<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="schnappi blog" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
 
 <body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="site-nav-toggle" id="site-nav-toggle">
-    <button>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-    </button>
-</div>
+    <div class="header-progress"></div>
 
-<div class="index-about">
-    <i> You only care about kindness, and God has its own measure </i>
-</div>
+    <div class="header-content">
 
-<div class="index-container">
-    
-    <div class="index-left">
-        
-<div class="nav" id="nav">
-    <div class="avatar-name">
-        <div class="avatar radius">
-            <img src="/img/logo.png" />
-        </div>
-        <div class="name">
-            <i>Schnappi618</i>
+        <a class="logo-title" href="/">
+            schnappi blog
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
         </div>
     </div>
-    <div class="contents" id="nav-content">
-        <ul>
-            <li >
-                <a href="/">
-                    <i class="iconfont icon-shouye1"></i>
-                    <span>主页</span>
-                </a>
-            </li>
-            <li >
-                <a href="/tags">
-                    <i class="iconfont icon-biaoqian1"></i>
-                    <span>标签</span>
-                </a>
-            </li>
-            <li >
-                <a href="/archives">
-                    <i class="iconfont icon-guidang2"></i>
-                    <span>存档</span>
-                </a>
-            </li>
-            <li >
-                <a href="/about/">
-                    <i class="iconfont icon-guanyu2"></i>
-                    <span>关于</span>
-                </a>
-            </li>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
             
-            <li>
-                <a id="search">
-                    <i class="iconfont icon-sousuo1"></i>
-                    <span>搜索</span>
-                </a>
-            </li>
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
             
         </ul>
     </div>
-    
-        <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#利用github-hexo搭建个人博客"><span class="toc-text">利用github+hexo搭建个人博客</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-在本机创建github-io页面"><span class="toc-text">1. 在本机创建github.io页面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-安装hexo"><span class="toc-text">2. 安装hexo</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-初始化页面"><span class="toc-text">3. 初始化页面</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#4-修改配置文件"><span class="toc-text">4. 修改配置文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#5-测试"><span class="toc-text">5. 测试</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#6-部署"><span class="toc-text">6. 部署</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#7-其他配置"><span class="toc-text">7. 其他配置</span></a></li></ol></li></ol></li></ol></li></ol>
-</div>
-    
-</div>
+
+    <div class="window-mask"></div>
+
+</header>
 
 
-<div class="search-field" id="search-field">
-    <div class="search-container">
-        <div class="search-input">
-            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
-            <input id="search-input"/>
-            <span id="begin-search">搜索</span>
-        </div>
-        <div class="search-result-container" id="search-result-container">
-
-        </div>
-    </div>
-</div>
-
-        <div class="index-about-mobile">
-            <i> You only care about kindness, and God has its own measure </i>
-        </div>
-    </div>
-    
-    <div class="index-middle">
-        <!-- Main Content -->
-        
-
-
-<div class="post-container">
-    <div class="post-title">
-        利用github+hexo搭建个人博客
     </div>
 
-    <div class="post-meta">
-        <span class="attr">发布于：<span>2020-02-26 18:33:16</span></span>
-        
-        <span class="attr">标签：/
-        
-        <a class="tag" href="/tags/#hexo" title="hexo">hexo</a>
-        <span>/</span>
-        
-        
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">利用github+hexo搭建个人博客</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2020-02-26 18:33:16
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/hexo/">hexo</a>
+                    </li>
+                
+            </ul>
         </span>
-        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
-</span>
-</span>
-    </div>
-    <div class="post-content ">
-        <h1 id="利用github-hexo搭建个人博客"><a href="#利用github-hexo搭建个人博客" class="headerlink" title="利用github+hexo搭建个人博客"></a>利用github+hexo搭建个人博客</h1><p>参考网页：</p>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/hexo/">hexo</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <h1 id="利用github-hexo搭建个人博客"><a href="#利用github-hexo搭建个人博客" class="headerlink" title="利用github+hexo搭建个人博客"></a>利用github+hexo搭建个人博客</h1><p>参考网页：</p>
 <p><a href="https://pages.github.com/" target="_blank" rel="noopener">https://pages.github.com/</a></p>
 <p><a href="https://www.jianshu.com/p/3db6a61d3782" target="_blank" rel="noopener">https://www.jianshu.com/p/3db6a61d3782</a></p>
 <p>搭建之前电脑所需安装软件：</p>
@@ -186,113 +176,184 @@
 
 
 
-        
-            <div class="donate-container">
-    <div class="donate-button">
-        <button id="donate-button">赞赏</button>
-    </div>
-    <div class="donate-img-container hide" id="donate-img-container">
-        <img id="donate-img" src="" data-src="/img/donate.jpg">
-        <p> 感谢鼓励 </p>
-    </div>
-</div>
-        
-        <br />
-        <div id="comment-container">
-        </div>
-        <div id="disqus_thread"></div>
-
-        <div id="lv-container">
         </div>
 
+        <div class="article-nav">
+            
+                <div class="article-prev">
+                    <a class="prev btn"
+                       rel="prev"
+                       href="/2020/03/07/clickhouse/%E5%88%A9%E7%94%A8docker%E5%AE%89%E8%A3%85%E5%90%AF%E5%8A%A8ClickHouse/"
+                    >
+                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">利用docker安装启动ClickHouse</span><span class="post-nav-item">Prev posts</span>
+                    </a>
+                </div>
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2020/02/22/other/hello-world/"
+                    >
+                        <span class="post-nav-title-item">Hello World</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
     </div>
 </div>
 
+
+                
+
+            </div>
+
+            
+                <div class="main-content-right">
+                    
+    <div class="sidebar sidebar-post fade-in-down-animation">
+        <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#利用github-hexo搭建个人博客"><span class="nav-number">1.</span> <span class="nav-text">利用github+hexo搭建个人博客</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-在本机创建github-io页面"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">1. 在本机创建github.io页面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-安装hexo"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">2. 安装hexo</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-初始化页面"><span class="nav-number">1.0.0.3.</span> <span class="nav-text">3. 初始化页面</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-修改配置文件"><span class="nav-number">1.0.0.4.</span> <span class="nav-text">4. 修改配置文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-测试"><span class="nav-number">1.0.0.5.</span> <span class="nav-text">5. 测试</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-部署"><span class="nav-number">1.0.0.6.</span> <span class="nav-text">6. 部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-其他配置"><span class="nav-number">1.0.0.7.</span> <span class="nav-text">7. 其他配置</span></a></li></ol></li></ol></li></ol></li></ol>
     </div>
 </div>
+    </div>
 
+                </div>
+            
 
-<footer class="footer">
-    <ul class="list-inline text-center">
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
         
-        <li>
-            <a target="_blank" href="https://twitter.com/li618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-twitter"></i>
-                            </span>
-            </a>
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
         </li>
         
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
         
-        <li>
-            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
-                            <span class="fa-stack fa-lg">
-                                 <i class="iconfont icon-zhihu"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
-        
-
-        
-        <li>
-            <a target="_blank"  href="https://github.com/schnappi618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-github"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
     </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2020 <a href="/">Schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
     
-    <p>
-        <span>/</span>
-        
-        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
-        <span>/</span>
-        
-        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
-        <span>/</span>
-        
-        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
-        <span>/</span>
-        
-    </p>
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
     
-    <p>
-        <span id="busuanzi_container_site_pv">
-            <span id="busuanzi_value_site_pv"></span>PV
-        </span>
-        <span id="busuanzi_container_site_uv">
-            <span id="busuanzi_value_site_uv"></span>UV
-        </span>
-        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
-</footer><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
 
 
 
 
 </body>
-
-<script>
-    // We expose some of the variables needed by the front end
-    window.hexo_search_path = "search.json"
-    window.hexo_root = "/"
-    window.isPost = true
-</script>
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-
-<script src="/js/index.js"></script>
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
 </html>

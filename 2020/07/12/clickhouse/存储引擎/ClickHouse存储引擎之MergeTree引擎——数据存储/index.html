@@ -1,154 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="schnappi_xxn">
-    <meta name="keyword"  content="">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-
+    
     <title>
-        
-        ClickHouse存储引擎之MergeTree引擎——数据存储 - Schnappi618的博客 | schnappi618&#39;s Blog
-        
+        ClickHouse存储引擎之MergeTree引擎——数据存储 | schnappi blog
     </title>
-
-    <!-- Custom CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-<link rel="stylesheet" href="/css/aircloud.css">
-
+        <link rel="shortcut icon" href="/images/favicon.png">
     
-<link rel="stylesheet" href="/css/gitment.css">
+    
+<link rel="stylesheet" href="/css/style.css">
 
-    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
-    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
-    <!-- ga & ba script hoook -->
-    <script></script>
-<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="schnappi blog" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
 
 <body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="site-nav-toggle" id="site-nav-toggle">
-    <button>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-    </button>
-</div>
+    <div class="header-progress"></div>
 
-<div class="index-about">
-    <i> You only care about kindness, and God has its own measure </i>
-</div>
+    <div class="header-content">
 
-<div class="index-container">
-    
-    <div class="index-left">
-        
-<div class="nav" id="nav">
-    <div class="avatar-name">
-        <div class="avatar radius">
-            <img src="/img/logo.png" />
-        </div>
-        <div class="name">
-            <i>Schnappi618</i>
+        <a class="logo-title" href="/">
+            schnappi blog
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
         </div>
     </div>
-    <div class="contents" id="nav-content">
-        <ul>
-            <li >
-                <a href="/">
-                    <i class="iconfont icon-shouye1"></i>
-                    <span>主页</span>
-                </a>
-            </li>
-            <li >
-                <a href="/tags">
-                    <i class="iconfont icon-biaoqian1"></i>
-                    <span>标签</span>
-                </a>
-            </li>
-            <li >
-                <a href="/archives">
-                    <i class="iconfont icon-guidang2"></i>
-                    <span>存档</span>
-                </a>
-            </li>
-            <li >
-                <a href="/about/">
-                    <i class="iconfont icon-guanyu2"></i>
-                    <span>关于</span>
-                </a>
-            </li>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
             
-            <li>
-                <a id="search">
-                    <i class="iconfont icon-sousuo1"></i>
-                    <span>搜索</span>
-                </a>
-            </li>
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
             
         </ul>
     </div>
-    
-        <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、按列存储"><span class="toc-text">一、按列存储</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、压缩数据块"><span class="toc-text">二、压缩数据块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、简介"><span class="toc-text">1、简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、压缩规则及流程"><span class="toc-text">2、压缩规则及流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、总结"><span class="toc-text">3、总结</span></a></li></ol></li></ol>
-</div>
-    
-</div>
+
+    <div class="window-mask"></div>
+
+</header>
 
 
-<div class="search-field" id="search-field">
-    <div class="search-container">
-        <div class="search-input">
-            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
-            <input id="search-input"/>
-            <span id="begin-search">搜索</span>
-        </div>
-        <div class="search-result-container" id="search-result-container">
-
-        </div>
-    </div>
-</div>
-
-        <div class="index-about-mobile">
-            <i> You only care about kindness, and God has its own measure </i>
-        </div>
-    </div>
-    
-    <div class="index-middle">
-        <!-- Main Content -->
-        
-
-
-<div class="post-container">
-    <div class="post-title">
-        ClickHouse存储引擎之MergeTree引擎——数据存储
     </div>
 
-    <div class="post-meta">
-        <span class="attr">发布于：<span>2020-07-12 15:21:13</span></span>
-        
-        <span class="attr">标签：/
-        
-        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
-        <span>/</span>
-        
-        <a class="tag" href="/tags/#engine" title="engine">engine</a>
-        <span>/</span>
-        
-        <a class="tag" href="/tags/#MergeTree" title="MergeTree">MergeTree</a>
-        <span>/</span>
-        
-        
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">ClickHouse存储引擎之MergeTree引擎——数据存储</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2020-07-12 15:21:13
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/clickhouse/">clickhouse</a>
+                    </li>
+                
+            </ul>
         </span>
-        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
-</span>
-</span>
-    </div>
-    <div class="post-content ">
-        <h2 id="一、按列存储"><a href="#一、按列存储" class="headerlink" title="一、按列存储"></a>一、按列存储</h2><p>​    在MergeTree中，数据按列存储，每个字段也独立单独存储，每个列字段均拥有一个对应的column.bin数据文件，这些数据文件便为数据的物理存储。数据文件以分区目录的形式被组织存放，所以每个分区目录中的bin文件只保存了当前分区片段内的该列数据。按列独立存储有利于更好的进行数据压缩(相同类型数据存放在一起)，还可以最小化需扫描数据的范围。</p>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/clickhouse/">clickhouse</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/engine/">engine</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/MergeTree/">MergeTree</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <h2 id="一、按列存储"><a href="#一、按列存储" class="headerlink" title="一、按列存储"></a>一、按列存储</h2><p>​    在MergeTree中，数据按列存储，每个字段也独立单独存储，每个列字段均拥有一个对应的column.bin数据文件，这些数据文件便为数据的物理存储。数据文件以分区目录的形式被组织存放，所以每个分区目录中的bin文件只保存了当前分区片段内的该列数据。按列独立存储有利于更好的进行数据压缩(相同类型数据存放在一起)，还可以最小化需扫描数据的范围。</p>
 <p>​    MergeTree会将经过压缩的数据存放到对应column.bin文件中，默认使用LZ4算法，然后将数据按照声明的ORDER BY排序。最后，数据会以压缩数据块的方式被有序的写入数据文件中的。</p>
 <h2 id="二、压缩数据块"><a href="#二、压缩数据块" class="headerlink" title="二、压缩数据块"></a>二、压缩数据块</h2><h3 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h3><p>​    一个压缩数据块由头信息和压缩数据两部分组成。头信息固定使用9位字节表示，具体由1个UInt8(1字节)和2个UInt32(4字节)整型组成，分别代表了使用的压缩算法类型、压缩后的数据大小和压缩前的数据大小，具体格式如图所示：</p>
 <img src="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/cunchu_1.svg" style="zoom:80%;">
@@ -168,113 +160,175 @@
 <p><img src="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/cunchu_2.svg"></p>
 <h3 id="3、总结"><a href="#3、总结" class="headerlink" title="3、总结"></a>3、总结</h3><p>​    一个column.bin文件是由一个到多个压缩数据块组成的，每个压缩数据块大小在64KB～1MB之间。多个压缩数据块之间，按照写入顺序首尾相接，紧密排列在一起。数据被压缩后可以减少数据大小，降低存储空间并且加快数据的传输效率，但数据的压缩和解压动作，本身也会带来额外的性能损耗，所以需要控制被压缩数据的大小。另外，在具体读取某一列的压缩数据时，首先需要将压缩数据(包含了整个压缩数据块以及下个压缩数据块的头文件)加载到内存并解压，再进行后续的数据处理。通过压缩数据块，可以在不读取整个.bin文件的情况下将读取粒度降低到压缩数据块级别，进一步缩小了数据读取的范围。</p>
 
-        
-            <div class="donate-container">
-    <div class="donate-button">
-        <button id="donate-button">赞赏</button>
-    </div>
-    <div class="donate-img-container hide" id="donate-img-container">
-        <img id="donate-img" src="" data-src="/img/donate.jpg">
-        <p> 感谢鼓励 </p>
-    </div>
-</div>
-        
-        <br />
-        <div id="comment-container">
-        </div>
-        <div id="disqus_thread"></div>
-
-        <div id="lv-container">
         </div>
 
+        <div class="article-nav">
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2020/07/12/clickhouse/%E7%AE%80%E8%BF%B0ClickHouse%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/"
+                    >
+                        <span class="post-nav-title-item">简述ClickHouse数据类型</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
     </div>
 </div>
 
+
+                
+
+            </div>
+
+            
+                <div class="main-content-right">
+                    
+    <div class="sidebar sidebar-post fade-in-down-animation">
+        <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、按列存储"><span class="nav-number">1.</span> <span class="nav-text">一、按列存储</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、压缩数据块"><span class="nav-number">2.</span> <span class="nav-text">二、压缩数据块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、简介"><span class="nav-number">2.1.</span> <span class="nav-text">1、简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、压缩规则及流程"><span class="nav-number">2.2.</span> <span class="nav-text">2、压缩规则及流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、总结"><span class="nav-number">2.3.</span> <span class="nav-text">3、总结</span></a></li></ol></li></ol>
     </div>
 </div>
+    </div>
 
+                </div>
+            
 
-<footer class="footer">
-    <ul class="list-inline text-center">
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
         
-        <li>
-            <a target="_blank" href="https://twitter.com/li618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-twitter"></i>
-                            </span>
-            </a>
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
         </li>
         
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
         
-        <li>
-            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
-                            <span class="fa-stack fa-lg">
-                                 <i class="iconfont icon-zhihu"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
-        
-
-        
-        <li>
-            <a target="_blank"  href="https://github.com/schnappi618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-github"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
     </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2020 <a href="/">Schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
     
-    <p>
-        <span>/</span>
-        
-        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
-        <span>/</span>
-        
-        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
-        <span>/</span>
-        
-        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
-        <span>/</span>
-        
-    </p>
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
     
-    <p>
-        <span id="busuanzi_container_site_pv">
-            <span id="busuanzi_value_site_pv"></span>PV
-        </span>
-        <span id="busuanzi_container_site_uv">
-            <span id="busuanzi_value_site_uv"></span>UV
-        </span>
-        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
-</footer><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
 
 
 
 
 </body>
-
-<script>
-    // We expose some of the variables needed by the front end
-    window.hexo_search_path = "search.json"
-    window.hexo_root = "/"
-    window.isPost = true
-</script>
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-
-<script src="/js/index.js"></script>
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
 </html>

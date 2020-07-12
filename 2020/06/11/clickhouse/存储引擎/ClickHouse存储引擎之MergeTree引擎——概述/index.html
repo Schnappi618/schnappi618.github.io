@@ -1,154 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
     <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="schnappi_xxn">
-    <meta name="keyword"  content="">
-    <link rel="shortcut icon" href="/img/favicon.ico">
-
+    
     <title>
-        
-        ClickHouse存储引擎之MergeTree引擎——概述 - Schnappi618的博客 | schnappi618&#39;s Blog
-        
+        ClickHouse存储引擎之MergeTree引擎——概述 | schnappi blog
     </title>
-
-    <!-- Custom CSS -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
-<link rel="stylesheet" href="/css/aircloud.css">
-
+        <link rel="shortcut icon" href="/images/favicon.png">
     
-<link rel="stylesheet" href="/css/gitment.css">
+    
+<link rel="stylesheet" href="/css/style.css">
 
-    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
-    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
-    <!-- ga & ba script hoook -->
-    <script></script>
-<meta name="generator" content="Hexo 4.2.0"><!-- hexo-inject:begin --><!-- hexo-inject:end --></head>
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="schnappi blog" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
 
 <body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
 
-<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="site-nav-toggle" id="site-nav-toggle">
-    <button>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-        <span class="btn-bar"></span>
-    </button>
-</div>
+    <div class="header-progress"></div>
 
-<div class="index-about">
-    <i> You only care about kindness, and God has its own measure </i>
-</div>
+    <div class="header-content">
 
-<div class="index-container">
-    
-    <div class="index-left">
-        
-<div class="nav" id="nav">
-    <div class="avatar-name">
-        <div class="avatar radius">
-            <img src="/img/logo.png" />
-        </div>
-        <div class="name">
-            <i>Schnappi618</i>
+        <a class="logo-title" href="/">
+            schnappi blog
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
         </div>
     </div>
-    <div class="contents" id="nav-content">
-        <ul>
-            <li >
-                <a href="/">
-                    <i class="iconfont icon-shouye1"></i>
-                    <span>主页</span>
-                </a>
-            </li>
-            <li >
-                <a href="/tags">
-                    <i class="iconfont icon-biaoqian1"></i>
-                    <span>标签</span>
-                </a>
-            </li>
-            <li >
-                <a href="/archives">
-                    <i class="iconfont icon-guidang2"></i>
-                    <span>存档</span>
-                </a>
-            </li>
-            <li >
-                <a href="/about/">
-                    <i class="iconfont icon-guanyu2"></i>
-                    <span>关于</span>
-                </a>
-            </li>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
             
-            <li>
-                <a id="search">
-                    <i class="iconfont icon-sousuo1"></i>
-                    <span>搜索</span>
-                </a>
-            </li>
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
             
         </ul>
     </div>
-    
-        <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#一、MergeTree系列引擎概述"><span class="toc-text">一、MergeTree系列引擎概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、MergeTree-合并树-引擎"><span class="toc-text">二、MergeTree(合并树)引擎</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、创建方式"><span class="toc-text">1、创建方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、配置参数介绍"><span class="toc-text">2、配置参数介绍</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、MergeTree存储结构"><span class="toc-text">三、MergeTree存储结构</span></a></li></ol>
-</div>
-    
-</div>
+
+    <div class="window-mask"></div>
+
+</header>
 
 
-<div class="search-field" id="search-field">
-    <div class="search-container">
-        <div class="search-input">
-            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
-            <input id="search-input"/>
-            <span id="begin-search">搜索</span>
-        </div>
-        <div class="search-result-container" id="search-result-container">
-
-        </div>
-    </div>
-</div>
-
-        <div class="index-about-mobile">
-            <i> You only care about kindness, and God has its own measure </i>
-        </div>
-    </div>
-    
-    <div class="index-middle">
-        <!-- Main Content -->
-        
-
-
-<div class="post-container">
-    <div class="post-title">
-        ClickHouse存储引擎之MergeTree引擎——概述
     </div>
 
-    <div class="post-meta">
-        <span class="attr">发布于：<span>2020-06-11 15:55:35</span></span>
-        
-        <span class="attr">标签：/
-        
-        <a class="tag" href="/tags/#clickhouse" title="clickhouse">clickhouse</a>
-        <span>/</span>
-        
-        <a class="tag" href="/tags/#engine" title="engine">engine</a>
-        <span>/</span>
-        
-        <a class="tag" href="/tags/#MergeTree" title="MergeTree">MergeTree</a>
-        <span>/</span>
-        
-        
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">ClickHouse存储引擎之MergeTree引擎——概述</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2020-06-11 15:55:35
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/clickhouse/">clickhouse</a>
+                    </li>
+                
+            </ul>
         </span>
-        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
-</span>
-</span>
-    </div>
-    <div class="post-content ">
-        <h2 id="一、MergeTree系列引擎概述"><a href="#一、MergeTree系列引擎概述" class="headerlink" title="一、MergeTree系列引擎概述"></a>一、MergeTree系列引擎概述</h2><p>​    在ClickHouse中，存储引擎决定了一张表拥有哪些特性以及读写数据的方式等。在所有的存储引擎中，MergeTree及其*MergeTree系列是最强大的表引擎，它适用于一些高负载任务，可以快速插入数据并在后台进行数据处理，还支持了主键索引、分区、数据复制等一些其他引擎不支持的功能。</p>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/clickhouse/">clickhouse</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/engine/">engine</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/MergeTree/">MergeTree</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <h2 id="一、MergeTree系列引擎概述"><a href="#一、MergeTree系列引擎概述" class="headerlink" title="一、MergeTree系列引擎概述"></a>一、MergeTree系列引擎概述</h2><p>​    在ClickHouse中，存储引擎决定了一张表拥有哪些特性以及读写数据的方式等。在所有的存储引擎中，MergeTree及其*MergeTree系列是最强大的表引擎，它适用于一些高负载任务，可以快速插入数据并在后台进行数据处理，还支持了主键索引、分区、数据复制等一些其他引擎不支持的功能。</p>
 <p>​    该类型的引擎包括：</p>
 <ul>
 <li><p>MergeTree</p>
@@ -260,113 +252,184 @@
 </li>
 </ul>
 
-        
-            <div class="donate-container">
-    <div class="donate-button">
-        <button id="donate-button">赞赏</button>
-    </div>
-    <div class="donate-img-container hide" id="donate-img-container">
-        <img id="donate-img" src="" data-src="/img/donate.jpg">
-        <p> 感谢鼓励 </p>
-    </div>
-</div>
-        
-        <br />
-        <div id="comment-container">
-        </div>
-        <div id="disqus_thread"></div>
-
-        <div id="lv-container">
         </div>
 
+        <div class="article-nav">
+            
+                <div class="article-prev">
+                    <a class="prev btn"
+                       rel="prev"
+                       href="/2020/06/27/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%88%86%E5%8C%BA/"
+                    >
+                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">ClickHouse存储引擎之MergeTree引擎——数据分区</span><span class="post-nav-item">Prev posts</span>
+                    </a>
+                </div>
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2020/06/09/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMySQL%E5%BC%95%E6%93%8E/"
+                    >
+                        <span class="post-nav-title-item">ClickHouse存储引擎之MySQL引擎</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
     </div>
 </div>
 
+
+                
+
+            </div>
+
+            
+                <div class="main-content-right">
+                    
+    <div class="sidebar sidebar-post fade-in-down-animation">
+        <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、MergeTree系列引擎概述"><span class="nav-number">1.</span> <span class="nav-text">一、MergeTree系列引擎概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、MergeTree-合并树-引擎"><span class="nav-number">2.</span> <span class="nav-text">二、MergeTree(合并树)引擎</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、创建方式"><span class="nav-number">2.1.</span> <span class="nav-text">1、创建方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、配置参数介绍"><span class="nav-number">2.2.</span> <span class="nav-text">2、配置参数介绍</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、MergeTree存储结构"><span class="nav-number">3.</span> <span class="nav-text">三、MergeTree存储结构</span></a></li></ol>
     </div>
 </div>
+    </div>
 
+                </div>
+            
 
-<footer class="footer">
-    <ul class="list-inline text-center">
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
         
-        <li>
-            <a target="_blank" href="https://twitter.com/li618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-twitter"></i>
-                            </span>
-            </a>
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
         </li>
         
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
         
-        <li>
-            <a target="_blank" href="https://www.zhihu.com/people/schnappixxn">
-                            <span class="fa-stack fa-lg">
-                                 <i class="iconfont icon-zhihu"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
-        
-
-        
-        <li>
-            <a target="_blank"  href="https://github.com/schnappi618">
-                            <span class="fa-stack fa-lg">
-                                <i class="iconfont icon-github"></i>
-                            </span>
-            </a>
-        </li>
-        
-
-        
-
     </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2020 <a href="/">Schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
     
-    <p>
-        <span>/</span>
-        
-        <span><a href="https://wallenotes.github.io/" target="_blank" rel="noopener">wallenotes</a></span>
-        <span>/</span>
-        
-        <span><a href="https://csoulsi.github.io/" target="_blank" rel="noopener">csoulsi</a></span>
-        <span>/</span>
-        
-        <span><a href="https://blog.csdn.net/lcl_xiaowugui" target="_blank" rel="noopener">my_csdn</a></span>
-        <span>/</span>
-        
-    </p>
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
     
-    <p>
-        <span id="busuanzi_container_site_pv">
-            <span id="busuanzi_value_site_pv"></span>PV
-        </span>
-        <span id="busuanzi_container_site_uv">
-            <span id="busuanzi_value_site_uv"></span>UV
-        </span>
-        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
-</footer><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
 
 
 
 
 </body>
-
-<script>
-    // We expose some of the variables needed by the front end
-    window.hexo_search_path = "search.json"
-    window.hexo_root = "/"
-    window.isPost = true
-</script>
-<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
-
-<script src="/js/index.js"></script>
-
-<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
 </html>
