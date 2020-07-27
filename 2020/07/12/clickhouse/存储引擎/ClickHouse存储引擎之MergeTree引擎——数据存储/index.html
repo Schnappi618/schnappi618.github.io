@@ -172,10 +172,21 @@
 </ul>
 <p><img src="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/cunchu_2.svg"></p>
 <h3 id="3、总结"><a href="#3、总结" class="headerlink" title="3、总结"></a>3、总结</h3><p>​    一个column.bin文件是由一个到多个压缩数据块组成的，每个压缩数据块大小在64KB～1MB之间。多个压缩数据块之间，按照写入顺序首尾相接，紧密排列在一起。数据被压缩后可以减少数据大小，降低存储空间并且加快数据的传输效率，但数据的压缩和解压动作，本身也会带来额外的性能损耗，所以需要控制被压缩数据的大小。另外，在具体读取某一列的压缩数据时，首先需要将压缩数据(包含了整个压缩数据块以及下个压缩数据块的头文件)加载到内存并解压，再进行后续的数据处理。通过压缩数据块，可以在不读取整个.bin文件的情况下将读取粒度降低到压缩数据块级别，进一步缩小了数据读取的范围。</p>
+<img src="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/cunchu_3.png" style="zoom:67%;">
+
 
         </div>
 
         <div class="article-nav">
+            
+                <div class="article-prev">
+                    <a class="prev btn"
+                       rel="prev"
+                       href="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/"
+                    >
+                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">ClickHouse存储引擎之MergeTree引擎——数据标记</span><span class="post-nav-item">Prev posts</span>
+                    </a>
+                </div>
             
             
                 <div class="article-next">

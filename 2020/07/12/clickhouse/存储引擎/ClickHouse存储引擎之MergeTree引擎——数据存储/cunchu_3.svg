@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns:xl="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 625 479" width="625" height="479">
+  <defs>
+    <font-face font-family="PingFang SC" font-size="10" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Helvetica Neue" font-size="10" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.16 
+    <dc:date>2020-07-20 16:29:20 +0000</dc:date>
+  </metadata>
+  <g id="Canvas_1" stroke="none" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none" fill="none">
+    <title>Canvas 1</title>
+    <rect fill="white" x="0" y="0" width="625" height="479"/>
+    <g id="Canvas_1: Layer 1">
+      <title>Layer 1</title>
+      <g id="Group_2">
+        <g id="Graphic_46">
+          <title>shape1</title>
+          <rect x="39" y="34" width="585" height="179" fill="white"/>
+          <rect x="39" y="34" width="585" height="179" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Graphic_45">
+          <title>shape2</title>
+          <rect x="347.5" y="90" width="251" height="95" fill="white"/>
+          <rect x="347.5" y="90" width="251" height="95" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Graphic_44">
+          <title>shape3</title>
+          <rect x="62" y="90" width="251" height="95" fill="white"/>
+          <rect x="62" y="90" width="251" height="95" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Group_41">
+          <title>shape4</title>
+          <g id="Graphic_43">
+            <rect x="83" y="106" width="100" height="60" fill="white"/>
+            <rect x="83" y="106" width="100" height="60" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+          <g id="Graphic_42">
+            <title>Text</title>
+            <text transform="translate(118 130.79)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="0" y="11">头文件</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_38">
+          <title>shape5</title>
+          <g id="Graphic_40">
+            <rect x="184" y="106" width="100" height="60" fill="white"/>
+            <rect x="184" y="106" width="100" height="60" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+          <g id="Graphic_39">
+            <title>Text</title>
+            <text transform="translate(214 130.79)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="0" y="11">压缩数据</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_35">
+          <title>shape6</title>
+          <g id="Graphic_37">
+            <rect x="373" y="106" width="100" height="60" fill="white"/>
+            <rect x="373" y="106" width="100" height="60" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+          <g id="Graphic_36">
+            <title>Text</title>
+            <text transform="translate(408 130.79)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="0" y="11">头文件</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_32">
+          <title>shape7</title>
+          <g id="Graphic_34">
+            <rect x="473" y="106" width="100" height="60" fill="white"/>
+            <rect x="473" y="106" width="100" height="60" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+          </g>
+          <g id="Graphic_33">
+            <title>Text</title>
+            <text transform="translate(503 130.79)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="0" y="11">压缩数据</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_30">
+          <title>shape8</title>
+          <g id="Graphic_31">
+            <title>Text</title>
+            <text transform="translate(152 55.29)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="27.62" y="11">压缩数据块</tspan>
+              <tspan font-family="Helvetica Neue" font-size="10" font-weight="400" fill="black" y="11">0</tspan>
+              <tspan font-family="Helvetica Neue" font-size="10" font-weight="400" fill="black" x="0" y="24">head stat:(65536, 12000)</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_28">
+          <title>shape9</title>
+          <g id="Graphic_29">
+            <title>Text</title>
+            <text transform="translate(444.5 55.29)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="27.62" y="11">压缩数据块</tspan>
+              <tspan font-family="Helvetica Neue" font-size="10" font-weight="400" fill="black" y="11">1</tspan>
+              <tspan font-family="Helvetica Neue" font-size="10" font-weight="400" fill="black" x="0" y="24">head stat:(65536, 14660)</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Graphic_24">
+          <title>shape12</title>
+          <path d="M 87.79609 170.8 L 87.79609 191.0817 C 86.44331 196.57465 89.82526 202.0676 95.91276 205.87042 C 102.00027 209.67324 110.79334 211.78592 120.26279 210.94085 L 248.10044 210.94085 C 256.8935 210.09577 265.68657 212.20845 272.45046 216.01127 C 278.53797 219.81408 281.24353 225.30704 280.56714 230.8 C 279.21436 225.30704 281.91992 219.81408 288.00743 216.01127 C 294.77132 212.20845 303.5644 210.09577 312.35745 210.94085 L 440.8715 210.94085 C 449.66456 211.78592 458.4576 209.67324 464.54513 205.87042 C 471.309 202.0676 474.0146 196.57465 472.6618 190.65915 L 472.6618 170.8" stroke="#323232" stroke-linecap="butt" stroke-linejoin="round" stroke-width="1"/>
+        </g>
+        <g id="Group_7">
+          <title>shape21</title>
+          <g id="Graphic_8">
+            <title>Text</title>
+            <text transform="translate(170.415 245)" fill="black">
+              <tspan font-family="PingFang SC" font-size="10" font-weight="400" fill="black" x="0" y="11">按需加载数据并解压，读取粒度进一步精确到压缩数据块</tspan>
+            </text>
+          </g>
+        </g>
+        <g id="Group_3">
+          <title>shape23</title>
+          <g id="Graphic_4">
+            <title>Text</title>
+            <text transform="translate(33 11.290001)" fill="black">
+              <tspan font-family="Helvetica Neue" font-size="10" font-weight="400" fill="black" x="58264504e-20" y="10">column.bin</tspan>
+            </text>
+          </g>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

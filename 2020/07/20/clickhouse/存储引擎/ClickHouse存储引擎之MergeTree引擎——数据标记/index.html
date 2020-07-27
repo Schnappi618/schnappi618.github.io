@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+    
+    <title>
+        ClickHouse存储引擎之MergeTree引擎——数据标记 | schnappi blog
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <link rel="shortcut icon" href="/images/favicon.png">
+    
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="schnappi blog" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+
+<body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
+
+    <div class="header-progress"></div>
+
+    <div class="header-content">
+
+        <a class="logo-title" href="/">
+            schnappi blog
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/links"
+                    >
+                        LINKS
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/links">LINKS</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+    </div>
+
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">ClickHouse存储引擎之MergeTree引擎——数据标记</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2020-07-20 23:15:56
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/clickhouse/">clickhouse</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/clickhouse/">clickhouse</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/engine/">engine</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/MergeTree/">MergeTree</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <h2 id="一、数据标记文件的作用"><a href="#一、数据标记文件的作用" class="headerlink" title="一、数据标记文件的作用"></a>一、数据标记文件的作用</h2><p>​    在MergeTree中，保存数据的物理文件包括索引文件primary.idx、column.bin数据文件和column.mrk数据标记文件(若使用了自适应大小的索引间隔，则标记文件会为column.mrk2)，这三种文件帮助人们快速找到需要的数据。如果把MergeTree看为一本书，primary.idx一级索引文件类似于书的一级章节目录，column.bin文件中的数据类似书中具体的文字，而数据标记文件则将一级章节目录和具体文字关联起来。</p>
+<p>​    对于数据标记而言，它记录了两个信息：一是一级章节对应的页码信息；二是对应的文字在某一页中的起始位置信息。通过数据标记文件就可以很快的翻到关注内容所在的页，并知道从第几行开始阅读。</p>
+<h2 id="二、数据标记的生成规则"><a href="#二、数据标记的生成规则" class="headerlink" title="二、数据标记的生成规则"></a>二、数据标记的生成规则</h2><p>​    数据标记文件、一级索引的对应关系大致如下：</p>
+<img src="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/biaoji_1.svg" style="zoom:70%;">
+
+<p>​    从上图可以看出列数据标记和索引区间是对齐的，都按照index_granularity(默认8192)索引粒度间隔，故通过索引区间的下标编号就可以直接找到对应的数据标记。</p>
+<p>​    数据标记文件也和column.bin文件一一对应，每一个列字段都有一个对应的column.mrk数据标记文件，用于记录数据在column.bin文件中的偏移量信息。一行标记数据用一个元组表示，元组内包含了两个整型数值的偏移量信息：某段数据区间内，对应的column.bin压缩文件中，压缩数据块的起始偏移量；未压缩数据的起始偏移量。对应关系如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th>编号</th>
+<th>压缩文件中的偏移量</th>
+<th>解压缩块中的偏移量</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>8192</td>
+</tr>
+<tr>
+<td>2</td>
+<td>0</td>
+<td>16384</td>
+</tr>
+<tr>
+<td>3</td>
+<td>0</td>
+<td>24576</td>
+</tr>
+<tr>
+<td>4</td>
+<td>0</td>
+<td>32768</td>
+</tr>
+<tr>
+<td>5</td>
+<td>0</td>
+<td>40960</td>
+</tr>
+<tr>
+<td>6</td>
+<td>0</td>
+<td>49152</td>
+</tr>
+<tr>
+<td>7</td>
+<td>0</td>
+<td>57344</td>
+</tr>
+<tr>
+<td>8</td>
+<td>12016</td>
+<td>0</td>
+</tr>
+<tr>
+<td>9</td>
+<td>12016</td>
+<td>8192</td>
+</tr>
+</tbody></table>
+<p>​    这里使用了之前MergeTree引擎——数据存储中的示例数据，可以看到在示例数据中，第0个压缩块的大小是12000，而在上表中对应的第0个压缩数据块的截止偏移量是12016，在数据存储的文章中我们知道，压缩数据块包含了压缩数据和头信息，并且为了让读取粒度进一步精确到压缩数据块，加载数据还包含了下一个压缩数据块的头文件，一个压缩数据块的头信息固定由9个字节组成，压缩后大小为8字节，所以这里截止偏移量就为8+12000+8=12016.</p>
+<p>​    由表中还可以看出，每一行标记数据都表示了一个片段的数据(默认8192行)在column.bin压缩文件中的读取位置信息。标记数据和一级索引数据不同，它不能常驻于内存中，clickhouse使用了LRU(最近最少使用)缓存策略加快其获取速度。</p>
+<h2 id="三、数据标记的工作方式"><a href="#三、数据标记的工作方式" class="headerlink" title="三、数据标记的工作方式"></a>三、数据标记的工作方式</h2><p>​    MergeTree读取数据时，需要通过标记数据的位置信息再找到需要的数据，整个查找过程大致分为读取压缩数据块和读取数据两个步骤</p>
+<img src="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/biaoji2.jpg" style="zoom:67%;">
+
+<p>​    上图为ClickHouse官方提供的hits_v1测试表中，JavaEnable字段标记文件和压缩数据文件的对应关系示例。由于测试表中JavaEnable字段的数据类型为UInt8，该列每行数据大小为1字节，hits_v1表的索引粒度index_granularity为8192，所以一个索引片段的数据大小为8192字节。按照压缩数据块的生成规则，当数据大小在64KB～1MB之间时，生成一个压缩数据块(64K=65536字节，65536/5192=8)，所以在该JavaEnable的标记文件中，每8行标记数据对应一个压缩数据块，故从图中可以看到，在标记文件中，压缩文件中8行数据的偏移量相同，这8行标记指向了同一个压缩数据块。由于每一个片段的数据大小都为8192字节，所以解压缩块中每8行的偏移量都按照8192的大小递增，到第9行时，又会置为0，这是由于从这里开始，又生成了下一个压缩数据块。</p>
+<p><strong>MergeTree定位压缩数据块并读取数据：</strong></p>
+<ol>
+<li><p>读取压缩数据块</p>
+<p>在查询某一列数据时，MergeTree不需要一次性加载所有column.bin文件，而可以根据需要，借助标记文件中保存的压缩数据偏移量只加载特定的数据块。</p>
+<p>在上图示例中，上下相邻两个压缩文件的起始偏移量，构成了获取当前标记对应压缩块的偏移量区间。由当前标记数据开始，向下找到不同的压缩文件偏移量为止，此时获得的一组偏移量区间，就是压缩数据块在column.bin数据文件中的偏移量。例如在上图中，读取.bin文件中[0, 12016]字节数据，就能得到第0个压缩数据块的数据。</p>
+</li>
+<li><p>读取数据</p>
+<p>在读取数据时，MergeTree也可以根据需要借助标记文件中保存的解压缩块中的偏移量，以index_granularity的索引粒度加载特定的一小段。标记数据中，上下相邻的两个解压缩块中的偏移起始量，构成了获取当前标记对应数据的偏移量区间。通过这个区间，能在它的压缩块解压之后，按照偏移量按需读取数据。例如，在图中，通过[0, 8192]便能够读取压缩块0中的第一个数据片段。</p>
+</li>
+</ol>
+
+        </div>
+
+        <div class="article-nav">
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/"
+                    >
+                        <span class="post-nav-title-item">ClickHouse存储引擎之MergeTree引擎——数据存储</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
+    </div>
+</div>
+
+    <div class="article-toc-container fade-in-down-animation">
+        <div class="article-toc">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、数据标记文件的作用"><span class="nav-text">一、数据标记文件的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、数据标记的生成规则"><span class="nav-text">二、数据标记的生成规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、数据标记的工作方式"><span class="nav-text">三、数据标记的工作方式</span></a></li></ol>
+    </div>
+</div>
+        </div>
+    </div>
+
+
+                
+
+            </div>
+
+            
+
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
+        
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
+        </li>
+        
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2020 <a href="/">Schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
+    
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
+    
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
+
+
+
+
+</body>
+</html>
