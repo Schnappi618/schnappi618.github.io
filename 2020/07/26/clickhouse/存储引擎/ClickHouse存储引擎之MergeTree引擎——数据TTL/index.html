@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+    
+    <title>
+        ClickHouse存储引擎之MergeTree引擎——数据TTL | schnappi blog
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <link rel="shortcut icon" href="/images/favicon.png">
+    
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="schnappi blog" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+
+<body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
+
+    <div class="header-progress"></div>
+
+    <div class="header-content">
+
+        <a class="logo-title" href="/">
+            schnappi blog
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/links"
+                    >
+                        LINKS
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/links">LINKS</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+    </div>
+
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">ClickHouse存储引擎之MergeTree引擎——数据TTL</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2020-07-26 20:59:35
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/clickhouse/">clickhouse</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/clickhouse/">clickhouse</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/engine/">engine</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/MergeTree/">MergeTree</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <h2 id="一、数据TTL"><a href="#一、数据TTL" class="headerlink" title="一、数据TTL"></a>一、数据TTL</h2><p>​    TTL(Time to Live)，表示数据的存活时间。在MergeTree中，可以为某个列字段或整张表设置TTL时间。若为列字段的TTL，当时间到期时，则会删除这一列的数据；若为表级别的TTL，当时间到期时，则会删除整张表的数据；若一张表同时设置了列级别和表级别的TTL，则会以先到期的为主。</p>
+<p>​    无论是列级别还是表级别的TTL，都需要依托于某个DateTime或Date类型的字段，通过对这个时间字段的INTERVAL操作，来描述TTL的过期时间，设置TTL过期时间的INTERVAL完整操作包括：SECOND、MINUTE、HOUR、DAY、WEEK、MONTH、QUARTER和YEAR。例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 表示数据存活时间为，time_col时间的三天内</span></span><br><span class="line">TTL time_col + INTERVAL 3 DAY</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 表示数据存活时间为，time_col一月内</span></span><br><span class="line">TTL time_col + INTERVAL 1 MONTH</span><br></pre></td></tr></table></figure>
+
+<h2 id="二、列级别TTL"><a href="#二、列级别TTL" class="headerlink" title="二、列级别TTL"></a>二、列级别TTL</h2><p>​    若设置了列级别的TTL，当列字段中的值过期时，ClickHouse会将他们替换成默认值。如果一个分区内，某一列的所有值都已过期，那么ClickHouse会从文件系统中删除这个分区目录下的列文件。</p>
+<p>​    如果想要设置列级别的TTL，需要在定义表字段的时候，为列声明TTL表达式，主键字段不能被声明成TTL。示例数据如下：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 创建有TTL列的表结构</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> ttl_table_t1</span><br><span class="line">(</span><br><span class="line">    <span class="string">`id`</span> <span class="keyword">String</span>, </span><br><span class="line">    <span class="string">`create_time`</span> DateTime, </span><br><span class="line">    <span class="string">`code`</span> <span class="keyword">String</span> TTL create_time + toIntervalSecond(<span class="number">10</span>), </span><br><span class="line">    <span class="string">`type`</span> UInt8 TTL create_time + toIntervalSecond(<span class="number">10</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = MergeTree</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> toYYYYMM(create_time)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">id</span></span><br><span class="line"></span><br><span class="line"><span class="comment">-- 可以看到，create_time为日期类型，列字段code和type都被设置了TTL时间，他们存活时间，都为create_time建立后向后10s</span></span><br><span class="line"><span class="comment">-- 写入测试数据</span></span><br><span class="line"><span class="keyword">INSERT</span> <span class="keyword">INTO</span> ttl_table_t1 <span class="keyword">VALUES</span>(<span class="string">'A000'</span>, <span class="keyword">now</span>(), <span class="string">'c1'</span>, <span class="number">1</span>), (<span class="string">'A000'</span>, <span class="keyword">now</span>() + <span class="built_in">INTERVAL</span> <span class="number">2</span> <span class="keyword">MINUTE</span>, <span class="string">'c1'</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查看数据</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> ttl_table_t1;</span><br><span class="line">┌─id───┬─────────create_time─┬─code─┬─type─┐</span><br><span class="line">│ A000 │ 2020-07-27 21:29:15 │ c1   │    1 │</span><br><span class="line">│ A000 │ 2020-07-27 21:31:15 │ c1   │    2 │</span><br><span class="line">└──────┴─────────────────────┴──────┴──────┘</span><br></pre></td></tr></table></figure>
+
+<p>ClickHouse看到数据已经过期的时候，将执行合并，合并的频率由<code>merge_with_ttl_timeout</code>参数控制，<code>SETTINGS merge_with_ttl_timeout = 86400 </code>默认为86400s即1天，如果这个值太低，表示ClickHouse需要执行许多计划外的合并，可能消耗大量的资源。</p>
+<p>如果在ClickHouse合并期间进行查询，可能会获得过期的数据，所以在select查询之前可使用<code>optimize</code>命令强制触发TTL清理机制。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 查看merge_with_ttl_timeout参数的值</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> system.merge_tree_settings <span class="keyword">where</span> <span class="keyword">name</span>=<span class="string">'merge_with_ttl_timeout'</span>;</span><br><span class="line">┌─name───────────────────┬─value─┬─changed─┬─description───────────────────────────────────────────────────┐</span><br><span class="line">│ merge_with_ttl_timeout │ 86400 │       0 │ Minimal time in seconds, when <span class="keyword">merge</span> <span class="keyword">with</span> TTL can be repeated. │</span><br><span class="line">└────────────────────────┴───────┴─────────┴───────────────────────────────────────────────────────────────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 10s后强制触发TTL清理，FINAL表示触发所有分区合并，没有FINAL表示触发一个分区合并</span></span><br><span class="line"><span class="keyword">optimize</span> <span class="keyword">TABLE</span> ttl_table_t1 <span class="keyword">FINAL</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 再次查看数据</span></span><br><span class="line"><span class="comment">-- 可以看到由于第一行满足TTL过期条件，所以被还原为了列的默认值</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> ttl_table_t1;</span><br><span class="line">┌─id───┬─────────create_time─┬─code─┬─type─┐</span><br><span class="line">│ A000 │ 2020-07-27 21:29:15 │      │    0 │</span><br><span class="line">│ A000 │ 2020-07-27 21:31:15 │ c1   │    2 │</span><br><span class="line">└──────┴─────────────────────┴──────┴──────┘</span><br></pre></td></tr></table></figure>
+
+<p>​    如果需要修改列字段的TTL或为已有字段添加TTL，可使用ALTER语句设置：<code>ALTER TABLE ttl_table_t1 MODIFY COLUMN code STRING TTL create_time + INTERVAL 1 DAY</code>，目前<strong>ClickHouse没有提供取消列级别TTL的方法。</strong></p>
+<h2 id="三、表级别TTL"><a href="#三、表级别TTL" class="headerlink" title="三、表级别TTL"></a>三、表级别TTL</h2><p>​    如果需要为整张表设置TTL过期时间，则需要在MergeTree的表参数重增加TTL表达式，例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> ttl_table_t2</span><br><span class="line">(</span><br><span class="line">    <span class="string">`id`</span> <span class="keyword">String</span>, </span><br><span class="line">    <span class="string">`create_time`</span> DateTime, </span><br><span class="line">    <span class="string">`code`</span> <span class="keyword">String</span> TTL create_time + toIntervalSecond(<span class="number">10</span>), </span><br><span class="line">    <span class="string">`type`</span> UInt8 TTL create_time + toIntervalSecond(<span class="number">10</span>)</span><br><span class="line">)</span><br><span class="line"><span class="keyword">ENGINE</span> = MergeTree</span><br><span class="line"><span class="keyword">PARTITION</span> <span class="keyword">BY</span> toYYYYMM(create_time)</span><br><span class="line"><span class="keyword">ORDER</span> <span class="keyword">BY</span> <span class="keyword">id</span></span><br><span class="line">TTL create_time + <span class="built_in">INTERVAL</span> <span class="number">1</span> <span class="keyword">DAY</span></span><br></pre></td></tr></table></figure>
+
+<p>​    上面示例中整张表都被设置了TTL，当触发到TTL清理时，满足过期时间的数据行将被整行删除。表级别的TTL也支持修改，同样适用ALTER语句：<code>ALTER TABLE ttl_table_t2 MODIFY TTL create_time + INTERVAL 3 DAY</code>，<strong>同样，表级别的TTL目前也不支持删除。</strong></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 执行上述alter语句修改后表结构如下：</span></span><br><span class="line">clickhouse-server_1 :) desc ttl_table_t2</span><br><span class="line"></span><br><span class="line"><span class="keyword">DESCRIBE</span> <span class="keyword">TABLE</span> ttl_table_t2</span><br><span class="line"></span><br><span class="line">┌─<span class="keyword">name</span>────────┬─<span class="keyword">type</span>─────┬─default_type─┬─default_expression─┬─<span class="keyword">comment</span>─┬─codec_expression─┬─ttl_expression─────────────────────┐</span><br><span class="line">│ <span class="keyword">id</span>          │ <span class="keyword">String</span>   │              │                    │         │                  │                                    │</span><br><span class="line">│ create_time │ DateTime │              │                    │         │                  │                                    │</span><br><span class="line">│ code        │ <span class="keyword">String</span>   │              │                    │         │                  │ create_time + toIntervalSecond(<span class="number">10</span>) │</span><br><span class="line">│ <span class="keyword">type</span>        │ UInt8    │              │                    │         │                  │ create_time + toIntervalSecond(<span class="number">10</span>) │</span><br><span class="line">└─────────────┴──────────┴──────────────┴────────────────────┴─────────┴──────────────────┴────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h2 id="四、TTL的运行原理"><a href="#四、TTL的运行原理" class="headerlink" title="四、TTL的运行原理"></a>四、TTL的运行原理</h2><p>​    当一张MergeTree表被设置了TTL表达式，在写入数据时，会以数据分区为单位，在每个分区目录内生成一个<code>ttl.txt</code>的文件，以上面的表ttl_table_t2为例，它既包含了列级别TTL，还包含了表级别的TTL。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">-- 向ttl_table_t2表插入数据</span></span><br><span class="line"><span class="keyword">insert</span> <span class="keyword">into</span> ttl_table_t2 <span class="keyword">VALUES</span>(<span class="string">'A000'</span>, <span class="keyword">now</span>(), <span class="string">'haha'</span>, <span class="number">2</span>), (<span class="string">'A001'</span>, <span class="keyword">now</span>(), <span class="string">'xx'</span>, <span class="number">2</span>) ;</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 查询</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> ttl_table_t2</span><br><span class="line"></span><br><span class="line">┌─<span class="keyword">id</span>───┬─────────create_time─┬─code─┬─<span class="keyword">type</span>─┐</span><br><span class="line">│ A000 │ <span class="number">2020</span><span class="number">-07</span><span class="number">-28</span> <span class="number">14</span>:<span class="number">28</span>:<span class="number">23</span> │ haha │    <span class="number">2</span> │</span><br><span class="line">│ A001 │ <span class="number">2020</span><span class="number">-07</span><span class="number">-28</span> <span class="number">14</span>:<span class="number">28</span>:<span class="number">23</span> │ xx   │    <span class="number">2</span> │</span><br><span class="line">└──────┴─────────────────────┴──────┴──────┘</span><br><span class="line"></span><br><span class="line"><span class="comment">-- 由于这里插入了两条数据，所以会有两个分区目录</span></span><br><span class="line">[root@xxxx ttl_table_t2]<span class="comment"># ll</span></span><br><span class="line">total <span class="number">8</span></span><br><span class="line">drwxr-x<span class="comment">--- 2 101 101 4096 Jul 28 14:28 202007_1_1_0</span></span><br><span class="line">drwxr-x<span class="comment">--- 2 101 101  272 Jul 28 14:28 202007_1_1_1</span></span><br><span class="line">drwxr-x<span class="comment">--- 2 101 101   10 Jul 28 14:28 detached</span></span><br><span class="line">-rw-r<span class="comment">----- 1 101 101    1 Jul 28 14:28 format_version.txt</span></span><br></pre></td></tr></table></figure>
+
+<p>​    在写入数据后，每个分区目录内都会生成ttl.txt文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## tree查看当前分区目录结构,用202007_1_1_0分区为例</span></span><br><span class="line">tree ./202007_1_1_0</span><br><span class="line">.</span><br><span class="line">├── checksums.txt</span><br><span class="line">├── code.bin</span><br><span class="line">├── code.mrk2</span><br><span class="line">├── columns.txt</span><br><span class="line">├── count.txt</span><br><span class="line">├── create_time.bin</span><br><span class="line">├── create_time.mrk2</span><br><span class="line">├── id.bin</span><br><span class="line">├── id.mrk2</span><br><span class="line">├── minmax_create_time.idx</span><br><span class="line">├── partition.dat</span><br><span class="line">├── primary.idx</span><br><span class="line">├── ttl.txt</span><br><span class="line">├── type.bin</span><br><span class="line">└── type.mrk2</span><br><span class="line"></span><br><span class="line"><span class="comment">## 查看ttl.txt信息</span></span><br><span class="line">cat ttl.txt </span><br><span class="line">ttl format version: 1</span><br><span class="line">&#123;<span class="string">"columns"</span>:[&#123;<span class="string">"name"</span>:<span class="string">"code"</span>,<span class="string">"min"</span>:1595917713,<span class="string">"max"</span>:1595917713&#125;,&#123;<span class="string">"name"</span>:<span class="string">"type"</span>,<span class="string">"min"</span>:1595917713,<span class="string">"max"</span>:1595917713&#125;],<span class="string">"table"</span>:&#123;<span class="string">"min"</span>:1596004103,<span class="string">"max"</span>:1596004103&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>​    通过ttl.txt内容可以发现，MergeTree时通过一串JSON配置保存了ttl的相关信息，其中：</p>
+<ul>
+<li>columns：用于保存列级别ttl的信息</li>
+<li>table：用于表示表级别ttl的信息</li>
+<li>min和max：保存了当前数据分区内，TTL指定日期字段的最小值、最大值分别与INVERTAL表达式计算后的时间戳。</li>
+</ul>
+<p>将table属性中的min和max时间戳格式化，并分别和create_time最小值与最大值对比：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> </span><br><span class="line">    toDateTime(<span class="string">'1596004103'</span>) <span class="keyword">AS</span> ttl_min, </span><br><span class="line">    toDateTime(<span class="string">'1596004103'</span>) <span class="keyword">AS</span> ttl_max, </span><br><span class="line">    ttl_min - <span class="keyword">MIN</span>(create_time) <span class="keyword">AS</span> expire_min, </span><br><span class="line">    ttl_max - <span class="keyword">MAX</span>(create_time) <span class="keyword">AS</span> expire_max</span><br><span class="line"><span class="keyword">FROM</span> ttl_table_t2</span><br><span class="line"></span><br><span class="line">┌─────────────ttl_min─┬─────────────ttl_max─┬─expire_min─┬─expire_max─┐</span><br><span class="line">│ <span class="number">2020</span><span class="number">-07</span><span class="number">-29</span> <span class="number">14</span>:<span class="number">28</span>:<span class="number">23</span> │ <span class="number">2020</span><span class="number">-07</span><span class="number">-29</span> <span class="number">14</span>:<span class="number">28</span>:<span class="number">23</span> │      <span class="number">86400</span> │      <span class="number">86400</span> │</span><br><span class="line">└─────────────────────┴─────────────────────┴────────────┴────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>TTL的处理逻辑：</strong></p>
+<ul>
+<li>MergeTree以分区目录为单位，通过分区内的ttl.txt文件记录过期时间，并最为后续的判断依据</li>
+<li>当写入一批数据时，都会给予INTERVAL表达式的计算结果为这个分区生成对应的ttl.txt文件</li>
+<li>在MergeTree进行合并分区时，会触发删除TTL过期数据的逻辑</li>
+<li>在选择删除的分区时，使用了贪婪算法：尽可能找到会最早过期，合并次数最多的分区(MaxBlockNum)最大</li>
+<li>如果一个分区内某一列数据因为TTL到期被全部删除，在合并之后的新分区目录中，不会包含这个列字段的数据文件(column.bin和column.mrk)</li>
+</ul>
+<p>ClickHouse针对列级别和表级别的TTL目前都没有提供删除TTL策略的方法，仅提供了全局开启/关闭TTL的方法：<code>SYSTEM START/STOP TTL MERGES;</code>，而且该配置并不能指定某张表开启或关闭TTL。</p>
+
+        </div>
+
+        <div class="article-nav">
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/"
+                    >
+                        <span class="post-nav-title-item">ClickHouse存储引擎之MergeTree引擎——数据标记</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
+    </div>
+</div>
+
+    <div class="article-toc-container fade-in-down-animation">
+        <div class="article-toc">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、数据TTL"><span class="nav-text">一、数据TTL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、列级别TTL"><span class="nav-text">二、列级别TTL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、表级别TTL"><span class="nav-text">三、表级别TTL</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、TTL的运行原理"><span class="nav-text">四、TTL的运行原理</span></a></li></ol>
+    </div>
+</div>
+        </div>
+    </div>
+
+
+                
+
+            </div>
+
+            
+
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
+        
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
+        </li>
+        
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2020 <a href="/">Schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
+    
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
+    
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
+
+
+
+
+</body>
+</html>
