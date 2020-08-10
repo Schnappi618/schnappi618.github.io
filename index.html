@@ -119,7 +119,43 @@
             <li class="home-article-item">
 
                 <h3 class="home-article-title">
-                    <a href="/2020/08/06/other/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
+                    <a href="/2020/08/10/DB/MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2SQL%E8%A7%A6%E5%8F%91%E9%98%88%E5%80%BC%E9%82%AE%E4%BB%B6%E6%8A%A5%E8%AD%A6/">
+                        
+                        MySQL慢查询SQL触发阈值邮件报警
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        一、项目背景业务数据库被异常调用时导致慢查询量增大，影响到正常业务使用，业务只能通过nginx超时异常等来进行问题排查，增大了定位和处理问题的难度、时间，尤其商品库或者交易库可能会出现页面无法正常显示的情况。故业务需求为若主库和从库慢查询总量每分钟超过某个阈值之后则发送邮件报警。
+二、开发逻辑...
+                    
+                </div>
+
+                <div class="home-article-meta-info">
+                    <div class="article-date">
+                        <span><i class="fa fa-pencil-square-o"></i> 2020-08-10</span>
+                        
+                            <span>
+                            <i class="fa fa-folder"></i>
+                            <ul>
+                                
+                                    <li><a
+                                                href="/categories/MySQL/">MySQL</a></li>
+                                
+                            </ul>
+                        </span>
+                        
+                    </div>
+                    
+                    <a href="/2020/08/10/DB/MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2SQL%E8%A7%A6%E5%8F%91%E9%98%88%E5%80%BC%E9%82%AE%E4%BB%B6%E6%8A%A5%E8%AD%A6/">Read more <i class="fa fa-angle-right"></i></a>
+                </div>
+            </li>
+        
+            <li class="home-article-item">
+
+                <h3 class="home-article-title">
+                    <a href="/2020/08/06/DB/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">
                         
                         MySQL使用tokuDB引擎无法备份问题排查
                     </a>
@@ -147,7 +183,7 @@
                         
                     </div>
                     
-                    <a href="/2020/08/06/other/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">Read more <i class="fa fa-angle-right"></i></a>
+                    <a href="/2020/08/06/DB/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/">Read more <i class="fa fa-angle-right"></i></a>
                 </div>
             </li>
         
@@ -429,41 +465,6 @@
                     </div>
                     
                     <a href="/2020/06/11/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%A6%82%E8%BF%B0/">Read more <i class="fa fa-angle-right"></i></a>
-                </div>
-            </li>
-        
-            <li class="home-article-item">
-
-                <h3 class="home-article-title">
-                    <a href="/2020/06/09/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMySQL%E5%BC%95%E6%93%8E/">
-                        
-                        ClickHouse存储引擎之MySQL引擎
-                    </a>
-                </h3>
-
-                <div class="home-article-content markdown-body">
-                    
-                        一、介绍​    ClickHouse提供了MySQL库引擎可以将MySQL中的表映射到ClickHouse中，并允许用户通过clickhouse对数据进行insert和update操作。实际的操作其实都在MySQL服务器上完成，MySQL引擎会将查询转换为MySQL语法并发送到MySQL服务...
-                    
-                </div>
-
-                <div class="home-article-meta-info">
-                    <div class="article-date">
-                        <span><i class="fa fa-pencil-square-o"></i> 2020-06-09</span>
-                        
-                            <span>
-                            <i class="fa fa-folder"></i>
-                            <ul>
-                                
-                                    <li><a
-                                                href="/categories/clickhouse/">clickhouse</a></li>
-                                
-                            </ul>
-                        </span>
-                        
-                    </div>
-                    
-                    <a href="/2020/06/09/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMySQL%E5%BC%95%E6%93%8E/">Read more <i class="fa fa-angle-right"></i></a>
                 </div>
             </li>
         

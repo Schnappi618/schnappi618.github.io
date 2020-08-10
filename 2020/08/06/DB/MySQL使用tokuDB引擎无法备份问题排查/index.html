@@ -186,11 +186,20 @@
 <p><strong>3. 解决方法</strong></p>
 <p>mydumper备份时添加<code>--lock-all-tables</code>参数，即强制在备份开始时开启<code>flush table with read lock;</code>，则在备份时该库无法写入数据，所有的更新操作都会被阻塞，从而强制获得一致性备份数据。由于所有备份都是在从库执行，所以写入阻塞没有很大影响，但数据量较大时会导致主从延迟出现。如果主库备份数据，还是使用mysqldump来进行备份比较稳妥。后面可以考虑用mysqlpump来实现所有备份操作。</p>
 <p>开启备份库的全日制可以看到，在备份开始时开启了FTWRL，备份完成后释放。</p>
-<p><img src="/2020/08/06/other/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/1.png"></p>
+<p><img src="/2020/08/06/DB/MySQL%E4%BD%BF%E7%94%A8tokuDB%E5%BC%95%E6%93%8E%E6%97%A0%E6%B3%95%E5%A4%87%E4%BB%BD%E9%97%AE%E9%A2%98%E6%8E%92%E6%9F%A5/1.png"></p>
 
         </div>
 
         <div class="article-nav">
+            
+                <div class="article-prev">
+                    <a class="prev btn"
+                       rel="prev"
+                       href="/2020/08/10/DB/MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2SQL%E8%A7%A6%E5%8F%91%E9%98%88%E5%80%BC%E9%82%AE%E4%BB%B6%E6%8A%A5%E8%AD%A6/"
+                    >
+                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">MySQL慢查询SQL触发阈值邮件报警</span><span class="post-nav-item">Prev posts</span>
+                    </a>
+                </div>
             
             
                 <div class="article-next">
