@@ -39,7 +39,7 @@
                     <a class=""
                        href="/"
                     >
-                        首页
+                        HOME
                     </a>
                 </li>
             
@@ -47,7 +47,7 @@
                     <a class=""
                        href="/archives"
                     >
-                        归档
+                        ARCHIVES
                     </a>
                 </li>
             
@@ -55,7 +55,7 @@
                     <a class=""
                        href="/links"
                     >
-                        友链
+                        LINKS
                     </a>
                 </li>
             
@@ -63,7 +63,7 @@
                     <a class=""
                        href="/about"
                     >
-                        关于
+                        ABOUT
                     </a>
                 </li>
             
@@ -79,22 +79,22 @@
             
                 <li class="drawer-menu-item">
                     <a class=""
-                       href="/">首页</a>
+                       href="/">HOME</a>
                 </li>
             
                 <li class="drawer-menu-item">
                     <a class=""
-                       href="/archives">归档</a>
+                       href="/archives">ARCHIVES</a>
                 </li>
             
                 <li class="drawer-menu-item">
                     <a class=""
-                       href="/links">友链</a>
+                       href="/links">LINKS</a>
                 </li>
             
                 <li class="drawer-menu-item">
                     <a class=""
-                       href="/about">关于</a>
+                       href="/about">ABOUT</a>
                 </li>
             
         </ul>
@@ -170,7 +170,7 @@
 </li>
 <li><p>创建一个和备份库同版本的数据库</p>
 </li>
-<li><p>使用myloader恢复：<code>myloader --user root --password xxxxxxxx --port 3487 --host 127.0.0.1 -C --directory /work/dba/backupDataPath/data --threads 8 --verbose 3 &gt; load.log 2&gt;&amp;1</code></p>
+<li><p>使用myloader恢复：<code>myloader --user root --password xxxxxxxx --port 3487 --host 127.0.0.1 -C --directory /path/to/backupDataPath/data --threads 8 --verbose 3 &gt; load.log 2&gt;&amp;1</code></p>
 <p>由于备份时进行了压缩，故恢复时需要用-C参数来进行解压，并输出恢复日志load.log</p>
 </li>
 <li><p>创建主从关系：主从信息位于备份目录下的data/metadata文件中，文件内容大致如下：</p>
@@ -182,7 +182,7 @@
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">root@(none))&gt;show slave status\G</span><br><span class="line">*************************** 1. row ***************************</span><br><span class="line">               Slave_IO_State: Waiting for master to send event</span><br><span class="line">                  Master_Host: x.x.x.x</span><br><span class="line">                  Master_User: xx</span><br><span class="line">                  Master_Port: 3487</span><br><span class="line">                Connect_Retry: 60</span><br><span class="line">              Master_Log_File: mysql-bin.000783</span><br><span class="line">          Read_Master_Log_Pos: 360153174</span><br><span class="line">               Relay_Log_File: relay-log.000002</span><br><span class="line">                Relay_Log_Pos: 283</span><br><span class="line">        Relay_Master_Log_File: mysql-bin.000668</span><br><span class="line">             Slave_IO_Running: Yes</span><br><span class="line">            Slave_SQL_Running: No</span><br><span class="line">              Replicate_Do_DB: </span><br><span class="line">          Replicate_Ignore_DB: </span><br><span class="line">           Replicate_Do_Table: </span><br><span class="line">       Replicate_Ignore_Table: </span><br><span class="line">      Replicate_Wild_Do_Table: </span><br><span class="line">  Replicate_Wild_Ignore_Table: </span><br><span class="line">                   Last_Errno: 1062</span><br><span class="line">                   Last_Error: Error 'Duplicate entry '426922153' for key 'PRIMARY'' on query.</span><br></pre></td></tr></table></figure>
 
 <p><strong>2. 问题原因</strong></p>
-<p>本次出现该问题是由于在备份过程中原数据库有数据写入，导致数据冲突。故使用备份数据进行恢复时出现’Duplicate entry’报错。在网上查找解决方法时发现其他人出现这个问题是由于两个库有想同表名、想同表结构的表同时进行恢复，这个还未进行测试验证。</p>
+<p>本次出现该问题是由于在备份过程中原数据库有数据写入，导致数据冲突。故使用备份数据进行恢复时出现’Duplicate entry’报错。在网上查找解决方法时发现其他人出现这个问题是由于两个库有相同表名、相同表结构的表同时进行恢复，这个还未进行测试验证。</p>
 <p><strong>3. 解决方法</strong></p>
 <p>mydumper备份时添加<code>--lock-all-tables</code>参数，即强制在备份开始时开启<code>flush table with read lock;</code>，则在备份时该库无法写入数据，所有的更新操作都会被阻塞，从而强制获得一致性备份数据。由于所有备份都是在从库执行，所以写入阻塞没有很大影响，但数据量较大时会导致主从延迟出现。如果主库备份数据，还是使用mysqldump来进行备份比较稳妥。后面可以考虑用mysqlpump来实现所有备份操作。</p>
 <p>开启备份库的全日制可以看到，在备份开始时开启了FTWRL，备份完成后释放。</p>
@@ -197,7 +197,7 @@
                        rel="prev"
                        href="/2020/08/10/DB/MySQL%E6%85%A2%E6%9F%A5%E8%AF%A2SQL%E8%A7%A6%E5%8F%91%E9%98%88%E5%80%BC%E9%82%AE%E4%BB%B6%E6%8A%A5%E8%AD%A6/"
                     >
-                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">MySQL慢查询SQL触发阈值邮件报警</span><span class="post-nav-item">上一篇</span>
+                        <i class="fa fa-chevron-left"></i> <span class="post-nav-title-item">MySQL慢查询SQL触发阈值邮件报警</span><span class="post-nav-item">Prev posts</span>
                     </a>
                 </div>
             
@@ -207,7 +207,7 @@
                        rel="next"
                        href="/2020/07/28/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BReplacingMergeTree%E5%BC%95%E6%93%8E/"
                     >
-                        <span class="post-nav-title-item">ClickHouse存储引擎之ReplacingMergeTree引擎</span><span class="post-nav-item">下一篇</span> <i class="fa fa-chevron-right"></i>
+                        <span class="post-nav-title-item">ClickHouse存储引擎之ReplacingMergeTree引擎</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
                     </a>
                 </div>
             
@@ -283,7 +283,7 @@
             &copy; 2020 <a href="/">schnappi617</a>
         </div>
         <div class="theme-info info-item">
-            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动 | 主题 <a
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
                     href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
         </div>
         
@@ -291,12 +291,12 @@
             <div class="website-count info-item">
                 
                     <span id="busuanzi_container_site_uv" style="display: none">
-                        访问人数<span id="busuanzi_value_site_uv"></span>
+                        UV<span id="busuanzi_value_site_uv"></span>
                     </span>
                 
                 
                     <span id="busuanzi_container_site_pv" style="display: none">
-                        总访问量<span id="busuanzi_value_site_pv"></span>
+                        PV<span id="busuanzi_value_site_pv"></span>
                     </span>
                 
             </div>
@@ -317,7 +317,7 @@
                 <input autocomplete="off"
                        autocorrect="off"
                        autocapitalize="off"
-                       placeholder="搜索..."
+                       placeholder="Search..."
                        spellcheck="false"
                        type="search"
                        class="search-input"
