@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="utf-8">
+    
+    <title>
+        MySQL优化之理解查询计划 | 国家一级保护废物
+    </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+        <link rel="shortcut icon" href="/images/favicon.png">
+    
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <script id="hexo-configurations">
+    let CONFIG = {"hostname":"schnappi618.github.io","root":"/","localsearch":{"enable":true,"trigger":"auto","unescape":false,"preload":false},"themeInfo":{"name":"ILS","version":"1.1.2","author":"XPoet","repository":"https://github.com/XPoet/hexo-theme-ils"},"path":"search.json"};
+  </script>
+<meta name="generator" content="Hexo 4.2.0"><link rel="alternate" href="/atom.xml" title="国家一级保护废物" type="application/atom+xml"><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+</head>
+
+
+<body>
+<!-- hexo-inject:begin --><!-- hexo-inject:end --><div class="page-template">
+    <div class="page-top">
+        <header class="header-wrapper">
+
+    <div class="header-progress"></div>
+
+    <div class="header-content">
+
+        <a class="logo-title" href="/">
+            国家一级保护废物
+        </a>
+
+        <ul class="menu-list">
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/"
+                    >
+                        HOME
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/archives"
+                    >
+                        ARCHIVES
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/links"
+                    >
+                        LINKS
+                    </a>
+                </li>
+            
+                <li class="menu-item">
+                    <a class=""
+                       href="/about"
+                    >
+                        ABOUT
+                    </a>
+                </li>
+            
+        </ul>
+
+        <div class="menu-bar">
+            <div class="menu-bar-middle"></div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/">HOME</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/archives">ARCHIVES</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/links">LINKS</a>
+                </li>
+            
+                <li class="drawer-menu-item">
+                    <a class=""
+                       href="/about">ABOUT</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+    </div>
+
+    <div class="page-middle ">
+
+        <main class="main-content normal-code-theme">
+
+            <div class="main-content-left">
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <h3><a class="title-hover-animation">MySQL优化之理解查询计划</a></h3>
+        </div>
+
+        <div class="meta-info">
+            <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa fa-calendar-o"></i> 2021-07-27 10:47:00
+    </span>
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa fa-folder"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/categories/MySQL/">MySQL</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa fa-tags"></i>
+            <ul>
+                
+                    <li>
+                        <a href="/tags/MySQL/">MySQL</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/Optimization/">Optimization</a>
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/EXPLAIN/">EXPLAIN</a>
+                    </li>
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa fa-eye"></i> <span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+        </div>
+
+        <div class="article-content markdown-body">
+            <p>要进行数据库 SQL 优化必须先理解一条 SQL 具体是怎么执行的。MySQL 提供了 EXPLAIN 来描述优化器处理 SQL 的规则以及流程。本文会详细解释 EXPLAIN 各字段的含义以及不同结果所代表的意义，从而帮助理解查询计划，为 SQL 优化做基础。</p>
+<h3 id="一、总览图"><a href="#一、总览图" class="headerlink" title="一、总览图"></a>一、总览图</h3><h3 id="二、EXPLAIN-概述"><a href="#二、EXPLAIN-概述" class="headerlink" title="二、EXPLAIN 概述"></a>二、EXPLAIN 概述</h3><p>EXPLAIN 中会解释 MySQL 是如何处理语句，包括表的连接方式以及处理顺序等信息。从 MySQL 5.6.3版本开始，EXPLAIN 可以分析SELECT、DELETE、INSERT、REPLACE 和 UPDATE 语句，在这之前，仅可以分析 SELECT 语句。</p>
+<p>EXPLAIN 通常会跟具体语句来进行解析查看，也可以直接查看连接执行 SQL 情况。eg：<code>EXPLAIN for connection 403326;</code></p>
+<p><code>Note: EXPLAIN tb_name;也可用来查看对应表中列信息，等同于SHOW COLUMNS FROM tb_name;</code></p>
+<h3 id="三、EXPLAIN-输出格式"><a href="#三、EXPLAIN-输出格式" class="headerlink" title="三、EXPLAIN 输出格式"></a>三、EXPLAIN 输出格式</h3><h4 id="1、EXPLAIN-输出列"><a href="#1、EXPLAIN-输出列" class="headerlink" title="1、EXPLAIN 输出列"></a>1、EXPLAIN 输出列</h4><table>
+<thead>
+<tr>
+<th><strong>列名</strong></th>
+<th><strong>json 名称</strong></th>
+<th><strong>意义</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>id</td>
+<td>select_id</td>
+<td>表 id 号</td>
+</tr>
+<tr>
+<td>select_type</td>
+<td>None</td>
+<td>select 查询类型</td>
+</tr>
+<tr>
+<td>table</td>
+<td>table_name</td>
+<td>表名</td>
+</tr>
+<tr>
+<td>partitions</td>
+<td>partitions</td>
+<td>匹配的分区</td>
+</tr>
+<tr>
+<td>type</td>
+<td>access_type</td>
+<td>连接类型</td>
+</tr>
+<tr>
+<td>possible_keys</td>
+<td>possible_keys</td>
+<td>可能的索引选择</td>
+</tr>
+<tr>
+<td>key</td>
+<td>key</td>
+<td>实际选择的索引</td>
+</tr>
+<tr>
+<td>key_len</td>
+<td>key_length</td>
+<td>所选key的长度</td>
+</tr>
+<tr>
+<td>ref</td>
+<td>ref</td>
+<td>与索引比较的列</td>
+</tr>
+<tr>
+<td>rows</td>
+<td>rows</td>
+<td>估计需要扫描的行数</td>
+</tr>
+<tr>
+<td>filtered</td>
+<td>filtered</td>
+<td>按表条件过滤的行的百分比</td>
+</tr>
+<tr>
+<td>Extra</td>
+<td>None</td>
+<td>附加信息</td>
+</tr>
+</tbody></table>
+<h4 id="2、各列详解"><a href="#2、各列详解" class="headerlink" title="2、各列详解"></a>2、各列详解</h4><p>以下 SQL 示范数据均来自于官方提供的 employees 库，可<a href="https://dev.mysql.com/doc/employee/en/employees-installation.html" target="_blank" rel="noopener">点击</a>下载测试数据</p>
+<h5 id="2-1-id-JSON-name-select-id"><a href="#2-1-id-JSON-name-select-id" class="headerlink" title="2.1 id(JSON name: select_id)"></a>2.1 id(JSON name: select_id)</h5><p>一般查询语句都以 SELECT 关键字开头，查询中每出现一个 SELECT 关键字，MySQL就会为其分配一个唯一的 id 值。这个值就是 EXPLAIN 结果的第一列。例如下面的简单查询只有一个 SELECT 关键字，所以 EXPLAIN 的结果就只有 id 为 1 的一条记录：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">(mysql)@[employees]&gt;explain select * from departments where dept_no = 'd009';</span><br><span class="line">+<span class="comment">----+-------------+-------------+------------+-------+---------------+---------+---------+-------+------+----------+-------+</span></span><br><span class="line">| id | select_type | table       | partitions | type  | possible_keys | key     | key_len | ref   | rows | filtered | Extra |</span><br><span class="line">+<span class="comment">----+-------------+-------------+------------+-------+---------------+---------+---------+-------+------+----------+-------+</span></span><br><span class="line">|  1 | SIMPLE      | departments | NULL       | const | PRIMARY       | PRIMARY | 12      | const |    1 |   100.00 | NULL  |</span><br><span class="line">+<span class="comment">----+-------------+-------------+------------+-------+---------------+---------+---------+-------+------+----------+-------+</span></span><br><span class="line">1 row in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+
+<p>对于连接查询来说，一个 SELECT 语句之后的 FROM 可能会有多个表，在执行计划中，每张表都会有一条记录，但这些记录的 id 号是相同的。例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(mysql)@[employees]&gt;explain select * from dept_manager inner join departments using(dept_no);</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+-----------+---------+-------------------------------+------+----------+-------------+</span></span><br><span class="line">| id | select_type | table        | partitions | type  | possible_keys | key       | key_len | ref                           | rows | filtered | Extra       |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+-----------+---------+-------------------------------+------+----------+-------------+</span></span><br><span class="line">|  1 | SIMPLE      | departments  | NULL       | index | PRIMARY       | dept_name | 122     | NULL                          |    9 |   100.00 | Using index |</span><br><span class="line">|  1 | SIMPLE      | dept_manager | NULL       | ref   | dept_no       | dept_no   | 12      | employees.departments.dept_no |    2 |   100.00 | NULL        |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+-----------+---------+-------------------------------+------+----------+-------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br></pre></td></tr></table></figure>
+
+<p>在上述<code> id 相同的情况下，出现在前面的表会先被执行</code>，这张表被称为驱动表，后面的表叫做被驱动表。所以从上面的结果来看，优化器打算让 departments 表做为驱动表，让 dept_manager 表做为被驱动表。</p>
+<p>对于包含子查询的语句可能会涉及到多个 SELECT 关键字，所以在包含子查询的查询执行计划中，每个 SELECT 关键字都会对应一个独立的 id 号。<code>在多个 id 值的情况下，id 值越大的会先执行</code>。例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">(mysql)@[employees]&gt;explain select * from dept_manager where dept_no in (select dept_no from departments where dept_no &lt; 'd015') or from_date &lt; '2000-01-01';</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+------+------+----------+--------------------------+</span></span><br><span class="line">| id | select_type | table        | partitions | type  | possible_keys | key     | key_len | ref  | rows | filtered | Extra                    |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+------+------+----------+--------------------------+</span></span><br><span class="line">|  1 | PRIMARY     | dept_manager | NULL       | ALL   | NULL          | NULL    | NULL    | NULL |   24 |   100.00 | Using where              |</span><br><span class="line">|  2 | SUBQUERY    | departments  | NULL       | range | PRIMARY       | PRIMARY | 12      | NULL |    9 |   100.00 | Using where; Using index |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+------+------+----------+--------------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.01</span> sec)</span><br></pre></td></tr></table></figure>
+
+<p>但有时 MySQL 会将 in 子查询重写为连接查询，可通过 EXPLAIN 的 id 是否相同以及 show warnings 的结果来了解是否进行了重写。例如：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">(mysql)@[employees]&gt;explain select * from dept_manager where dept_no in (select dept_no from departments where dept_no &lt; 'd015');</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+-------------------------------+------+----------+--------------------------+</span></span><br><span class="line">| id | select_type | table        | partitions | type  | possible_keys | key     | key_len | ref                           | rows | filtered | Extra                    |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+-------------------------------+------+----------+--------------------------+</span></span><br><span class="line">|  1 | SIMPLE      | departments  | NULL       | range | PRIMARY       | PRIMARY | 12      | NULL                          |    9 |   100.00 | Using where; Using index |</span><br><span class="line">|  1 | SIMPLE      | dept_manager | NULL       | ref   | dept_no       | dept_no | 12      | employees.departments.dept_no |    2 |   100.00 | NULL                     |</span><br><span class="line">+<span class="comment">----+-------------+--------------+------------+-------+---------------+---------+---------+-------------------------------+------+----------+--------------------------+</span></span><br><span class="line">2 rows in <span class="keyword">set</span>, <span class="number">1</span> <span class="keyword">warning</span> (<span class="number">0.00</span> sec)</span><br><span class="line"></span><br><span class="line">Note (Code <span class="number">1003</span>): <span class="comment">/* select#1 */</span> <span class="keyword">select</span> <span class="string">`employees`</span>.<span class="string">`dept_manager`</span>.<span class="string">`emp_no`</span> <span class="keyword">AS</span> <span class="string">`emp_no`</span>,<span class="string">`employees`</span>.<span class="string">`dept_manager`</span>.<span class="string">`dept_no`</span> <span class="keyword">AS</span> <span class="string">`dept_no`</span>,<span class="string">`employees`</span>.<span class="string">`dept_manager`</span>.<span class="string">`from_date`</span> <span class="keyword">AS</span> <span class="string">`from_date`</span>,<span class="string">`employees`</span>.<span class="string">`dept_manager`</span>.<span class="string">`to_date`</span> <span class="keyword">AS</span> <span class="string">`to_date`</span> <span class="keyword">from</span> <span class="string">`employees`</span>.<span class="string">`departments`</span> <span class="keyword">join</span> <span class="string">`employees`</span>.<span class="string">`dept_manager`</span> <span class="keyword">where</span> ((<span class="string">`employees`</span>.<span class="string">`dept_manager`</span>.<span class="string">`dept_no`</span> = <span class="string">`employees`</span>.<span class="string">`departments`</span>.<span class="string">`dept_no`</span>) <span class="keyword">and</span> (<span class="string">`employees`</span>.<span class="string">`departments`</span>.<span class="string">`dept_no`</span> &lt; <span class="string">'d015'</span>))</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+        </div>
+
+        <div class="article-nav">
+            
+            
+                <div class="article-next">
+                    <a class="next btn"
+                       rel="next"
+                       href="/2021/04/08/DB/MySQL%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D/"
+                    >
+                        <span class="post-nav-title-item">MySQL备份恢复</span><span class="post-nav-item">Next posts</span> <i class="fa fa-chevron-right"></i>
+                    </a>
+                </div>
+            
+        </div>
+
+        <div class="comment-container">
+            <div class="comments-container">
+    
+</div>
+        </div>
+    </div>
+</div>
+
+    <div class="article-toc-container fade-in-down-animation">
+        <div class="article-toc">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#一、总览图"><span class="nav-text">一、总览图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二、EXPLAIN-概述"><span class="nav-text">二、EXPLAIN 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、EXPLAIN-输出格式"><span class="nav-text">三、EXPLAIN 输出格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、EXPLAIN-输出列"><span class="nav-text">1、EXPLAIN 输出列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2、各列详解"><span class="nav-text">2、各列详解</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#2-1-id-JSON-name-select-id"><span class="nav-text">2.1 id(JSON name: select_id)</span></a></li></ol></li></ol></li></ol>
+    </div>
+</div>
+        </div>
+    </div>
+
+
+                
+
+            </div>
+
+            
+
+        </main>
+
+        <div class="sidebar-tools">
+            <div class="tools-container">
+    <ul class="tools-list">
+        
+            <li class="search popup-trigger">
+                <i class="fa fa-search"></i>
+            </li>
+            
+<script src="/js/local-search.js"></script>
+
+        
+        <li class="mode-toggle">
+            <i class="fa fa-moon-o"></i>
+        </li>
+        
+            <li class="rss">
+                <a href="/atom.xml" target="_blank"><i class="fa fa-rss"></i></a>
+            </li>
+        
+    </ul>
+</div>
+
+        </div>
+
+        
+            <div class="scroll-to-top">
+                <ul>
+                    <li>
+                        <!--<i class="fa fa-caret-up"></i>-->
+                        <span class="scroll-percent"></span>
+                    </li>
+                </ul>
+            </div>
+        
+    </div>
+
+    <div class="page-bottom">
+        <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy; 2021 <a href="/">schnappi618</a>
+        </div>
+        <div class="theme-info info-item">
+            Powered by <a target="_blank" href="https://hexo.io">Hexo</a> | Theme <a
+                    href="https://github.com/XPoet/hexo-theme-ils" target="_blank">ILS v1.1.2</a>
+        </div>
+        
+            <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv" style="display: none">
+                        UV<span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" style="display: none">
+                        PV<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+</div>
+
+    <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+          <span class="search-icon">
+            <i class="fa fa-search"></i>
+          </span>
+            <div class="search-input-container">
+                <input autocomplete="off"
+                       autocorrect="off"
+                       autocapitalize="off"
+                       placeholder="Search..."
+                       spellcheck="false"
+                       type="search"
+                       class="search-input"
+                >
+            </div>
+            <span class="popup-btn-close">
+                <i class="fa fa-times"></i>
+            </span>
+        </div>
+        <div id="search-result">
+            <div id="no-result">
+                <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="/js/main.js"></script>
+<script src="/js/header-shrink.js"></script>
+<script src="/js/toggle-mode.js"></script>
+
+
+
+    
+<script src="/js/scroll-to-top.js"></script>
+
+
+
+
+
+    
+        
+<script src="/js/code-copy.js"></script>
+
+    
+
+    
+        
+<script src="/lib/anime.min.js"></script>
+<script src="/js/toc.js"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+
+    
+
+
+
+
+</body>
+</html>
