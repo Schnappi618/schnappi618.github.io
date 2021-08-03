@@ -424,6 +424,9 @@
 <p>可以看出，上述 Extra 列不仅出现了 Using temporary，还出现了 Using filesort。这是由于在 MySQL 中，group by 查询会默认添加上 order by 子句，如果不想进行排序，需要我们显式添加 <code>order by NULL</code>子句，避免查询时排序产生的成本。建立和维护临时表的成本非常大，对 SQL 执行效率有比较大的影响，尽量通过索引来替换掉临时表的使用。</p>
 </li>
 </ul>
+<hr>
+<p><strong>参考 《MySQL 是怎样运行的：从根儿上理解 MySQL》 作者:小孩子4919</strong></p>
+<p><strong>参考 《MySQL 官方文档</strong>》</p>
 
         </div>
 
