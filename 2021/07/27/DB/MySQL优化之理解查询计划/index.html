@@ -297,8 +297,8 @@
 <h5 id="2-3-table-JSON-name-table-name"><a href="#2-3-table-JSON-name-table-name" class="headerlink" title="2.3 table(JSON name: table_name)"></a>2.3 table(JSON name: table_name)</h5><p>每行所涉及的表的名称。有以下一些特殊的值：</p>
 <ul>
 <li>&lt;unionM, N&gt;：EXPLAIN 结果中 id 为 M 和 N 的两条记录结果并集的临时表，一般用于 UNION 去重</li>
-<li><derivedN>：EXPLAIN 结果中 id 为 N 的行的派生表结果。派生表一般指 FROM 子句中的子查询</derivedN></li>
-<li><subqueryN>：EXPLAIN 结果中对 id 为 N 的行的物化子查询的结果</subqueryN></li>
+<li>&lt;derivedN&gt;：EXPLAIN 结果中 id 为 N 的行的派生表结果。派生表一般指 FROM 子句中的子查询</li>
+<li>&lt;subqueryN&gt;：EXPLAIN 结果中对 id 为 N 的行的物化子查询的结果</li>
 </ul>
 <h5 id="2-4-partitions-JSON-name-partitions"><a href="#2-4-partitions-JSON-name-partitions" class="headerlink" title="2.4 partitions(JSON name: partitions)"></a>2.4 partitions(JSON name: partitions)</h5><p>分区表中查询匹配记录的分区。未使用分区表该值为 NULL</p>
 <h5 id="2-5-type-JSON-name-access-type"><a href="#2-5-type-JSON-name-access-type" class="headerlink" title="2.5 type(JSON name: access_type)"></a>2.5 type(JSON name: access_type)</h5><p>表示 MySQL 对某个表的访问方法。完整的访问方法包含：NULL、system、const、eq_ref、ref、fulltext、ref_or_null、index_merge、unique_subquery、index_subquery、range、index、ALL。常见访问方式如下：</p>
