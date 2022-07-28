@@ -119,6 +119,76 @@
             <li class="home-article-item">
 
                 <h3 class="home-article-title">
+                    <a href="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/">
+                        
+                        ClickHouse存储引擎之MergeTree引擎——数据标记
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        一、数据标记文件的作用​    在MergeTree中，保存数据的物理文件包括索引文件primary.idx、column.bin数据文件和column.mrk数据标记文件(若使用了自适应大小的索引间隔，则标记文件会为column.mrk2)，这三种文件帮助人们快速找到需要的数据。如果把Mer...
+                    
+                </div>
+
+                <div class="home-article-meta-info">
+                    <div class="article-date">
+                        <span><i class="fa fa-pencil-square-o"></i> 2020-07-20</span>
+                        
+                            <span>
+                            <i class="fa fa-folder"></i>
+                            <ul>
+                                
+                                    <li><a
+                                                href="/categories/clickhouse/">clickhouse</a></li>
+                                
+                            </ul>
+                        </span>
+                        
+                    </div>
+                    
+                    <a href="/2020/07/20/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E6%A0%87%E8%AE%B0/">Read more <i class="fa fa-angle-right"></i></a>
+                </div>
+            </li>
+        
+            <li class="home-article-item">
+
+                <h3 class="home-article-title">
+                    <a href="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">
+                        
+                        ClickHouse存储引擎之MergeTree引擎——数据存储
+                    </a>
+                </h3>
+
+                <div class="home-article-content markdown-body">
+                    
+                        一、按列存储​    在MergeTree中，数据按列存储，每个字段也独立单独存储，每个列字段均拥有一个对应的column.bin数据文件，这些数据文件便为数据的物理存储。数据文件以分区目录的形式被组织存放，所以每个分区目录中的bin文件只保存了当前分区片段内的该列数据。按列独立存储有利于更好...
+                    
+                </div>
+
+                <div class="home-article-meta-info">
+                    <div class="article-date">
+                        <span><i class="fa fa-pencil-square-o"></i> 2020-07-12</span>
+                        
+                            <span>
+                            <i class="fa fa-folder"></i>
+                            <ul>
+                                
+                                    <li><a
+                                                href="/categories/clickhouse/">clickhouse</a></li>
+                                
+                            </ul>
+                        </span>
+                        
+                    </div>
+                    
+                    <a href="/2020/07/12/clickhouse/%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E/ClickHouse%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E4%B9%8BMergeTree%E5%BC%95%E6%93%8E%E2%80%94%E2%80%94%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8/">Read more <i class="fa fa-angle-right"></i></a>
+                </div>
+            </li>
+        
+            <li class="home-article-item">
+
+                <h3 class="home-article-title">
                     <a href="/2020/07/12/clickhouse/%E7%AE%80%E8%BF%B0ClickHouse%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/">
                         
                         简述ClickHouse数据类型
@@ -420,77 +490,6 @@
                     </div>
                     
                     <a href="/2020/04/20/harbor/harbor%E9%85%8D%E7%BD%AEhttps/">Read more <i class="fa fa-angle-right"></i></a>
-                </div>
-            </li>
-        
-            <li class="home-article-item">
-
-                <h3 class="home-article-title">
-                    <a href="/2020/04/09/harbor/harbor%E9%85%8D%E7%BD%AEnginx%E4%BB%A3%E7%90%86/">
-                        
-                        harbor配置nginx代理
-                    </a>
-                </h3>
-
-                <div class="home-article-content markdown-body">
-                    
-                        ​        从前面的文章harbor搭建docker私有镜像仓库可以看出harbor默认只能使用harbor.yml中hostname指定的ip或主机名作为web访问地址，但在实际使用过程中，一般不允许ip地址或者主机名直接暴露在外访问，故需要配置nginx代理，通过代理后指定的地址进行...
-                    
-                </div>
-
-                <div class="home-article-meta-info">
-                    <div class="article-date">
-                        <span><i class="fa fa-pencil-square-o"></i> 2020-04-09</span>
-                        
-                            <span>
-                            <i class="fa fa-folder"></i>
-                            <ul>
-                                
-                                    <li><a
-                                                href="/categories/harbor/">harbor</a></li>
-                                
-                            </ul>
-                        </span>
-                        
-                    </div>
-                    
-                    <a href="/2020/04/09/harbor/harbor%E9%85%8D%E7%BD%AEnginx%E4%BB%A3%E7%90%86/">Read more <i class="fa fa-angle-right"></i></a>
-                </div>
-            </li>
-        
-            <li class="home-article-item">
-
-                <h3 class="home-article-title">
-                    <a href="/2020/04/08/harbor/harbor%E9%85%8D%E7%BD%AE%E5%A4%96%E9%83%A8%E6%95%B0%E6%8D%AE%E5%BA%93/">
-                        
-                        harbor配置外部数据库
-                    </a>
-                </h3>
-
-                <div class="home-article-content markdown-body">
-                    
-                        ​        harbor默认安装会使用官方打包的PostgreSQL docker镜像goharbor/harbor-db，harbor启动之后的数据均存放在改数据库上，后续管理可能存在不便，故使用harbor配置外部数据库。
-一、搭建PostgreSQL数据库​        harb...
-                    
-                </div>
-
-                <div class="home-article-meta-info">
-                    <div class="article-date">
-                        <span><i class="fa fa-pencil-square-o"></i> 2020-04-08</span>
-                        
-                            <span>
-                            <i class="fa fa-folder"></i>
-                            <ul>
-                                
-                                    <li><a
-                                                href="/categories/harbor/">harbor</a></li>
-                                
-                            </ul>
-                        </span>
-                        
-                    </div>
-                    
-                    <a href="/2020/04/08/harbor/harbor%E9%85%8D%E7%BD%AE%E5%A4%96%E9%83%A8%E6%95%B0%E6%8D%AE%E5%BA%93/">Read more <i class="fa fa-angle-right"></i></a>
                 </div>
             </li>
         
