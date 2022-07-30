@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xl="http://www.w3.org/1999/xlink" version="1.1" viewBox="-193.58546 961.1 247.21777 147.97636" width="247.21777" height="147.97636">
+  <defs>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="FilledArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -4 8 8" markerWidth="8" markerHeight="8" color="black">
+      <g>
+        <path d="M 5.68 0 L 0 -2.13 L 0 2.13 Z" fill="currentColor" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.11.4 
+    <dc:date>2022-07-30 08:43:10 +0000</dc:date>
+  </metadata>
+  <g id="Canvas_1" stroke-dasharray="none" fill="none" stroke="none" stroke-opacity="1" fill-opacity="1">
+    <title>Canvas 1</title>
+    <g id="Canvas_1: Layer 1">
+      <title>Layer 1</title>
+      <g id="Graphic_415">
+        <path d="M -34.2145 999.0828 L -91.00331 999.0828 L -79.64555 975.1661 L -45.57226 975.1661 Z" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_416">
+        <ellipse cx="-27.791576" cy="984.0653" rx="6.93636202103151" ry="6.02023874369795" fill="#666"/>
+        <ellipse cx="-27.791576" cy="984.0653" rx="6.93636202103151" ry="6.02023874369795" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_418">
+        <path d="M -150.58451 1046.5343 L -150.58451 1103.3231 L -174.50127 1091.9654 L -174.50127 1057.8921 Z" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_417">
+        <ellipse cx="-168.48104" cy="1039.598" rx="6.02023874369793" ry="6.9363620210315" fill="#666"/>
+        <ellipse cx="-168.48104" cy="1039.598" rx="6.02023874369793" ry="6.9363620210315" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_426">
+        <path d="M -86.97081 1087.5441 L -51.23245 1043.4109 L -39.793307 1067.2888 L -61.23632 1093.7688 Z" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_425">
+        <path d="M -79.12042 1108.4772 C -82.65225 1109.1028 -85.61457 1106.704 -85.73695 1103.1192 C -85.85935 1099.5345 -83.09547 1096.1214 -79.56365 1095.4958 C -76.03183 1094.8702 -73.06951 1097.2691 -72.94712 1100.8538 C -72.82472 1104.4385 -75.5886 1107.8516 -79.12042 1108.4772" fill="#666"/>
+        <path d="M -79.12042 1108.4772 C -82.65225 1109.1028 -85.61457 1106.704 -85.73695 1103.1192 C -85.85935 1099.5345 -83.09547 1096.1214 -79.56365 1095.4958 C -76.03183 1094.8702 -73.06951 1097.2691 -72.94712 1100.8538 C -72.82472 1104.4385 -75.5886 1107.8516 -79.12042 1108.4772" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_424">
+        <path d="M -87.13647 1087.5615 L -51.39811 1043.4283 L -39.95897 1067.3063 L -61.401985 1093.7862 Z" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_427">
+        <path d="M 17.158275 1035.1902 C 20.32392 1033.5038 23.882534 1034.8699 25.106667 1038.2413 C 26.330815 1041.6127 24.756918 1045.7129 21.591267 1047.3992 C 18.425622 1049.0856 14.867007 1047.7196 13.642875 1044.3481 C 12.418726 1040.9767 13.992623 1036.8765 17.158275 1035.1902" fill="#666"/>
+        <path d="M 17.158275 1035.1902 C 20.32392 1033.5038 23.882534 1034.8699 25.106667 1038.2413 C 26.330815 1041.6127 24.756918 1045.7129 21.591267 1047.3992 C 18.425622 1049.0856 14.867007 1047.7196 13.642875 1044.3481 C 12.418726 1040.9767 13.992623 1036.8765 17.158275 1035.1902" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_431">
+        <path d="M 46.05074 1088.7813 L 16.319302 1060.07 L 34.357435 1053.2907 L 52.196296 1070.5175 Z" stroke="gray" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_433">
+        <line x1="-63.781406" y1="1011.811" x2="-63.781406" y2="969.18" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Line_434">
+        <line x1="-138.76029" y1="1074.2744" x2="-185.50546" y2="1074.2744" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Line_435">
+        <line x1="-83.15084" y1="1062.0668" x2="-41.21408" y2="1087.4282" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+      <g id="Line_436">
+        <line x1="15.790318" y1="1083.6291" x2="47.754674" y2="1051.8764" marker-end="url(#FilledArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4.0,4.0" stroke-width="1"/>
+      </g>
+    </g>
+  </g>
+</svg>
